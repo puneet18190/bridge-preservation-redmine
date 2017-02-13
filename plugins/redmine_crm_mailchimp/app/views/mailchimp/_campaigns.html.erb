@@ -1,0 +1,27 @@
+<% user = MailchimpEmail.new(@contact.email) %>
+<% if user.campaigns.any? %>
+  <h3><%= l(:label_mailchimp_campaigns) %></h3>
+  <table class="list issues">
+    <thead>
+      <tr>
+        <th><%= l(:label_mailchimp_title) %></th>
+        <th><%= l(:label_mailchimp_subject) %></th>
+        <th><%= l(:label_mailchimp_send_time) %></th>
+        <th><%= l(:label_mailchimp_opened) %></th>
+        <th><%= l(:label_mailchimp_clicked) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% user.campaigns.each do |campaign| %>
+        <tr>
+          <td class="name"><%= campaign.title %></td>
+          <td class="name"><%= campaign.subject %></td>
+          <td><%= format_time(campaign.send_time) %></td>
+          <td><%= checked_image user.opened_campaign?(campaign)  %></td>
+          <td><%= checked_image user.clicked_campaign?(campaign) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+</div>

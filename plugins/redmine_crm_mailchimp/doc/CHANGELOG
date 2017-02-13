@@ -1,0 +1,21 @@
+== Redmine Mailchimp plugin changelog
+
+Redmine Mailchimp plugin - Redmine CRM Mailchimp integration
+Copyright (C) 2011-2016 RedmineUp
+https://www.redmineup.com/
+
+== 2016-11-14 v1.0.2
+
+* User details
+* Campaigns open and click rates
+* List subsribe date
+
+== 2015-12-03 v1.0.1
+
+* Redmine 3 support
+* Fixed sync bug
+
+== 2014-12-25 v1.0.0
+
+ * Redmine 2.3 - 2.6 support
+ * Initial release

@@ -1,0 +1,13 @@
+<% product = f.object.product %>
+<% unless product.blank? %>
+  <td class="product-image"><%= product_tag(product, :size => 32, :type => 'image')  %></td>
+<% end %>
+<td class="item" colspan="<%= product.blank? ? 2 : 1  %>">
+  <%= product_tag(product, :type => 'plain') unless product.blank? %>
+  <%= f.hidden_field :product_id %>
+  <% if !product.blank? && f.object.description.blank? %>
+    <br>
+    <em class="info"><%= link_to_function "(#{l(:label_products_add_description)})", "$(this).hide(); $(this).parent().next().show(); return false;"  %></em>
+  <% end %>
+  <%= f.text_area :description, :no_label => true, :rows => f.object.description.blank? ? 2 : [f.object.description.lines.count, 2].max, :onkeyup => "activateTextAreaResize(this);", :style => "width:99%; #{(product.blank? || !f.object.description.blank?) ? "" : "display:none;"}" -%>
+</td>

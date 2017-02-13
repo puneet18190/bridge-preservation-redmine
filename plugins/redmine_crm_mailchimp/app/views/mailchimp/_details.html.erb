@@ -1,0 +1,72 @@
+<% user = MailchimpEmail.new(@contact.email) %>
+<% unless user.details.blank? %>
+<h3><%= l(:label_mailchimp_details) %></h3>
+<div class="issue contact details">
+  <div class="splitcontent">
+    <div class="splitcontentleft">
+      <% unless user.member_url.blank? && RedmineCrmMailchimp::Settings[:show_links] %>
+      <div class="location attribute">
+        <div class="label"><%= l(:label_mailchimp_member_link) %>:</div>
+        <div class="value"><%= link_to @contact.name, user.member_url %></div>
+      </div>
+      <% end %>
+      <% unless user.location.blank? %>
+      <div class="location attribute">
+        <div class="label"><%= l(:label_mailchimp_location) %>:</div>
+        <div class="value"><%= link_to(user.location, user.gmap_url).to_s.html_safe %></div>
+      </div>
+      <% end %>
+      <% unless user.timezone.blank? %>
+      <div class="timezone attribute">
+        <div class="label"><%= l(:label_mailchimp_timezone) %>:</div>
+        <div class="value"><%= user.timezone %></div>
+      </div>
+      <% end %>
+      <% unless user.language.blank? %>
+      <div class="language attribute">
+        <div class="label"><%= l(:label_mailchimp_language) %>:</div>
+        <div class="value"><%= user.language %></div>
+      </div>
+      <% end %>
+      <% unless user.favorite_email_client.blank? %>
+      <div class="favorite_email_client attribute">
+        <div class="label"><%= l(:label_mailchimp_favorite_email_client) %>:</div>
+        <div class="value"><%= user.favorite_email_client  %></div>
+      </div>
+      <% end %>
+      <% unless user.subscribed.blank? %>
+      <div class="favorite_email_client attribute">
+        <div class="label"><%= l(:label_mailchimp_subscribed) %>:</div>
+        <div class="value"><%= format_date(user.subscribed) %></div>
+      </div>
+      <% end %>
+    </div>
+    <div class="splitcontentleft">
+      <% unless user.rating.blank? %>
+      <div class="member_rating attribute">
+        <div class="label"><%= l(:label_mailchimp_member_rating) %>:</div>
+        <div class="value"><%= user.rating  %></div>
+      </div>
+      <% end %>
+      <% unless user.open_rate.blank? %>
+      <div class="due-date attribute">
+        <div class="label"><%= l(:label_mailchimp_open_rate) %>:</div>
+        <div class="value"><%= user.open_rate %>%</div>
+      </div>
+      <% end %>
+      <% unless user.click_rate.blank? %>
+      <div class="click_rate attribute">
+        <div class="label"><%= l(:label_mailchimp_click_rate) %>:</div>
+        <div class="value"><%= user.click_rate  %>%</div>
+      </div>
+      <% end %>
+      <% unless user.info_changed.blank? %>
+      <div class="click_rate attribute">
+        <div class="label"><%= l(:label_mailchimp_info_changed) %>:</div>
+        <div class="value"><%= format_date(user.info_changed) %></div>
+      </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+<% end %>
