@@ -1,0 +1,19 @@
+<%= error_messages_for @client_application %>
+<div class="box">
+  <div class="field">
+    <label for="client_application_name"><%= l(:field_name) %>*</label><br/>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <label for="client_application_url"><%= l(:oauth_main_application_url) %>*</label><br/>
+    <%= f.text_field :url %>
+  </div>
+  <div class="field">
+    <label for="client_application_callback_url"><%= l(:oauth_callback_url) %>*</label><br/>
+    <%= f.text_field :callback_url %>
+  </div>
+  <div class="field">
+    <label for="client_application_support_url"><%= l(:oauth_support_url) %></label><br/>
+    <%= f.text_field :support_url %>
+  </div>
+</div>

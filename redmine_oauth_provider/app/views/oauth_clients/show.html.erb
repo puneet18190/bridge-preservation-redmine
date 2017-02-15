@@ -1,0 +1,24 @@
+<h1><%= l(:oauth_detail, :name => @client_application.name) %></h1>
+<p>
+  <strong><%= l(:oauth_consumer_key) %>:</strong>
+  <code><%=@client_application.key %></code>
+</p>
+<p>
+  <strong><%= l(:oauth_consumer_secret) %>:</strong>
+  <code><%=@client_application.secret %></code>
+</p>
+<p>
+  <strong><%= l(:oauth_request_token_url) %></strong>
+  <code>http<%='s' if request.ssl? %>://<%= request.host_with_port %><%= request_token_path %></code>
+</p>
+<p>
+  <strong><%= l(:oauth_access_token_url) %></strong>
+  <code>http<%='s' if request.ssl? %>://<%= request.host_with_port %><%= access_token_path %></code>
+</p>
+<p>
+  <strong><%= l(:oauth_authorize_url) %></strong>
+  <code>http<%='s' if request.ssl? %>://<%= request.host_with_port %><%= authorize_path %></code>
+</p>
+
+<%= link_to l(:button_edit), edit_oauth_client_path(@client_application) %> |
+<%= link_to l(:button_back), oauth_clients_path %>

@@ -1,0 +1,19 @@
+# English strings go here for Rails i18n
+zh:
+  oauth_allow: "允許"
+  oauth_deny: "拒絕"
+  oauth_authorize_tilte:  帳號存取驗證
+  oauth_authorize_comment: 您是否同意下列應用程式存取您的帳號？
+  oauth_deny_message: 您已拒絕此要求
+  oauth_client_applications: OAuth客戶端應用程式
+  oauth_main_application_url: 應用程式URL
+  oauth_callback_url: Callback URL
+  oauth_support_url: Support URL
+  oauth_edit_application: 編輯
+  oauth_register_application: 註冊新應用程式
+  oauth_detail: OAuth %{name} 的詳細內容
+  oauth_consumer_key: Consumer Key
+  oauth_consumer_secret: Consumer Secret
+  oauth_request_token_url: Request Token URL
+  oauth_access_token_url: Access Token URL
+  oauth_authorize_url: Authorize URL

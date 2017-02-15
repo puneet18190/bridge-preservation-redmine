@@ -1,0 +1,7 @@
+<h1><%= l(:oauth_edit_application) %></h1>
+<%= form_for @client_application, :url => oauth_client_path(@client_application), :html => {:method => :put}  do |f| %>
+       <%= render :partial => "form", :locals => { :f => f } %>
+       <%= submit_tag l(:button_edit) %>
+<% end %>
+<%= link_to l(:button_show), oauth_client_path(@client_application) %> |
+<%= link_to l(:button_back), oauth_clients_path %>

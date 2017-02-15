@@ -1,0 +1,16 @@
+<h1><%= l(:oauth_authorize_tilte) %></h1>
+<p><%= l(:oauth_authorize_comment) %></p>
+<p>
+  <%= link_to(@token.client_application.name, @token.client_application.url) %>
+  (<%= link_to(@token.client_application.url, @token.client_application.url) %>)
+</p>
+<%= form_tag authorize_url do %>
+  <%= hidden_field_tag "oauth_token", @token.token %>
+  <%- if params[:oauth_callback] -%>
+  <%= hidden_field_tag "oauth_callback", params[:oauth_callback] %>
+<%- end -%>
+<p>
+  <%= submit_tag(l(:oauth_allow), :name => :allow, :autofocus => true) %>
+  <%= submit_tag(l(:oauth_deny), :name => :deny) %>
+</p>
+<% end %>

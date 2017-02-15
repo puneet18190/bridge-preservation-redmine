@@ -1,0 +1,24 @@
+<h1><%= l(:oauth_client_applications) %></h1>
+<% unless @client_applications.empty? %>
+  <table class="list oauth-clients">
+    <thead>
+      <tr>
+        <th><%= l(:field_name) %></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @client_applications.each do |client|%>
+        <tr>
+          <td><%= link_to client.name, oauth_client_path(client) %></td>
+          <td><%= link_to l(:button_edit), edit_oauth_client_path(client), :class => "icon icon-edit" %></td>
+          <td><%= link_to l(:button_delete), oauth_client_path(client), :confirm => l(:text_are_you_sure), :method => :delete, :class => "icon icon-del" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+<%= link_to l(:oauth_register_application), { :action => :new }, :class => "icon icon-add" %>
+
+<%= stylesheet_link_tag 'application.css', :plugin => 'redmine_oauth_provider' %>
