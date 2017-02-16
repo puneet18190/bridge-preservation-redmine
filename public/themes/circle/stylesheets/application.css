@@ -957,3 +957,20 @@ div.details {padding: 20px !important;}
     border-color: #000;
   }
 }
+
+/**********************************************************/
+/* CUSTOM - TODO: MOVE OUTSIDE OF THEME */
+/**********************************************************/
+#header {
+	background-color: #373a3c;
+}
+
+#main-menu {
+	background-color: #404346;
+}
+
+#header > h1 {
+	padding: 25px 10px 25px 94px;
+	background: url(../images/bp_logo.png) no-repeat 6px 13px;
+    background-size: 75px auto;
+}
