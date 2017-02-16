@@ -50,10 +50,13 @@ class ProjectsController < ApplicationController
         end
         @projects = scope.to_a
       }
+
+
       format.api  {
         @offset, @limit = api_offset_and_limit
         @project_count = scope.count
         @projects = scope.offset(@offset).limit(@limit).to_a
+        
       }
       format.atom {
         projects = scope.reorder(:created_on => :desc).limit(Setting.feeds_limit.to_i).to_a
