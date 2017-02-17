@@ -32,6 +32,7 @@ group :ldap do
   gem "net-ldap", "~> 0.12.0"
 end
 
+gem 'active_model_serializers'
 
 # Optional gem for OpenID authentication
 group :openid do
