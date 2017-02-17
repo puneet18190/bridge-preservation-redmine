@@ -1,6 +1,8 @@
 class ProjectsApiController < ApplicationController
-  unloadable
+  
 
+  unloadable
+  
   menu_item :overview
   menu_item :settings, :only => :settings
 
@@ -24,6 +26,7 @@ class ProjectsApiController < ApplicationController
   helper :repositories
   helper :members
 
+
   # Lists visible projects
  def index
     scope = Project.visible.sorted
@@ -32,11 +35,12 @@ class ProjectsApiController < ApplicationController
     @project_count = scope.count
     @projects = scope.offset(@offset).limit(@limit).to_a
 
-    if params[:include] 
+    included_data = params[:include].split(',') rescue []
+    include_activities = included_data.include?('activities')
+  
 
-    end
-
-    render json: {projects: @projects}, :include => :trackers
+    render json: {projects: ActiveModel::Serializer::CollectionSerializer
+      .new(@projects, serializer: ActiveModel::Serializer::ProjectSerializer, include_activities: include_activities, user: User.current, from: Date.today - 5.days, to: Date.today, limit: 5) }
 
 
   end
@@ -197,6 +201,9 @@ class ProjectsApiController < ApplicationController
   #   redirect_to project_path(@project)
   # end
 
+  private 
+
+  
   # # Delete @project
   # def destroy
   #   @project_to_destroy = @project
