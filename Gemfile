@@ -32,7 +32,7 @@ group :ldap do
   gem "net-ldap", "~> 0.12.0"
 end
 
-
+gem 'case_transform' "~> 0.2"
 # Optional gem for OpenID authentication
 group :openid do
   gem "ruby-openid", "~> 2.3.0", :require => "openid"
