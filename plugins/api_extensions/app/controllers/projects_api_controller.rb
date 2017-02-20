@@ -7,13 +7,14 @@ class ProjectsApiController < ApplicationController
   menu_item :settings, :only => :settings
 
   before_filter :find_project, :except => [ :index, :list, :new, :create, :copy ]
-  before_filter :authorize, :except => [ :index, :list, :new, :create, :copy, :archive, :unarchive, :destroy]
+  before_action ->(controller='projects', action=params[:action] ){authorize(controller, action, true)}, :except => [:list, :new, :create, :copy, :archive, :unarchive, :destroy]
   before_filter :authorize_global, :only => [:new, :create]
   before_filter :require_admin, :only => [ :copy, :archive, :unarchive, :destroy ]
+  #before_filter :set_current_user
   accept_rss_auth :index
   accept_api_auth :index, :show, :create, :update, :destroy
   require_sudo_mode :destroy
-
+ 
   after_filter :only => [:create, :edit, :update, :archive, :unarchive, :destroy] do |controller|
     if controller.request.post?
       controller.send :expire_action, :controller => 'welcome', :action => 'robots'
@@ -24,7 +25,7 @@ class ProjectsApiController < ApplicationController
   helper :issues
   helper :queries
   helper :repositories
-  helper :members
+  helper :members 
 
 
   # Lists visible projects
@@ -36,14 +37,23 @@ class ProjectsApiController < ApplicationController
     @projects = scope.offset(@offset).limit(@limit).to_a
 
     included_data = params[:include].split(',') rescue []
+
     include_activities = included_data.include?('activities')
   
 
     render json: {projects: ActiveModel::Serializer::CollectionSerializer
-      .new(@projects, serializer: ActiveModel::Serializer::ProjectSerializer, include_activities: include_activities, user: User.current, from: Date.today - 5.days, to: Date.today, limit: 5) }
+      .new(@projects, serializer: ActiveModel::Serializer::ProjectSerializer, include_activities: include_activities, user: User.current,  from: Date.today - 5.days, to: Date.today, limit: 5) }
 
 
   end
+
+
+  private 
+
+  # def set_current_user
+  #   t = Token.find_by(value: params[:key], action: 'api')
+  #   @user = User.find(t.user_id)
+  # end
 
   # def new
   #   @issue_custom_fields = IssueCustomField.sorted.to_a

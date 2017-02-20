@@ -10,7 +10,7 @@ class ProjectSerializer < ActiveModel::Serializer
     to = instance_options[:to]
     limit = instance_options[:limit]
     if instance_options[:include_activities]
-     Redmine::Activity::Fetcher.new(instance_options[:user], :project => object).events(from, to, {:limit=>limit })
+     return Redmine::Activity::Fetcher.new(instance_options[:user], :project => object).events(from, to, {:limit=>limit })
     end
   end
 
