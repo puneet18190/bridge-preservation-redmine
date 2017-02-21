@@ -43,4 +43,58 @@ class OauthController < ApplicationController
     authorize_without_allow
   end
   alias_method_chain :authorize, :allow
+
+   def authorize
+        if params[:oauth_token] || true
+          @token = ::RequestToken.find_by_token! params[:oauth_token] rescue nil
+          oauth1_authorize
+        else
+          if request.post?
+            @authorizer = OAuth::Provider::Authorizer.new current_user, user_authorizes_token?, params
+            redirect_to @authorizer.redirect_uri
+          else
+            @client_application = ClientApplication.find_by_key! params[:client_id]
+            render :action => "oauth2_authorize"
+          end
+        end
+  end
+  
+  protected
+  #for now we overwrite the authorize method to skip the authorize step for users
+  def oauth1_authorize
+
+
+   unless @token  
+          render :action=>"authorize_failure"
+          return
+   end
+
+
+    unless @token.invalidated? 
+       if request.post? || true 
+            if user_authorizes_token? || true 
+              @token.authorize!(current_user)
+              callback_url  = @token.oob? ? @token.client_application.callback_url : @token.callback_url
+              @redirect_url = URI.parse(callback_url) unless callback_url.blank?
+
+              unless @redirect_url.to_s.blank?
+                @redirect_url.query = @redirect_url.query.blank? ?
+                                      "oauth_token=#{@token.token}&oauth_verifier=#{@token.verifier}" :
+                                      @redirect_url.query + "&oauth_token=#{@token.token}&oauth_verifier=#{@token.verifier}"
+                redirect_to @redirect_url.to_s
+              else
+                render :action => "authorize_success"
+              end
+            else
+              @token.invalidate!
+              render :action => "authorize_failure"
+            end
+          end
+        else
+          render :action => "authorize_failure"
+        end
+  end
+
+
+
 end
