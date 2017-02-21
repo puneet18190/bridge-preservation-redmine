@@ -34,11 +34,10 @@ class QcLogsApiController < ApplicationController
     @offset, @limit = api_offset_and_limit
     @qc_log_count = scope.count
     @qc_logs = scope.offset(@offset).limit(@limit).to_a
-
     #included_data = params[:include].split(',') rescue []
     #include_activities = included_data.include?('activities')
 
-    render json: {qc_logs: @qc_logs}
+    render json:  @qc_logs
     #render json: {projects: ActiveModel::Serializer::CollectionSerializer
     #  .new(@projects, serializer: ActiveModel::Serializer::ProjectSerializer, include_activities: include_activities, user: User.current, from: Date.today - 5.days, to: Date.today, limit: 5) }
 
@@ -53,8 +52,7 @@ class QcLogsApiController < ApplicationController
   # end
 
   def create
-
-    @qc_log = QcLog.new(params[:qc_log])
+    @qc_log = QcLog.new(qc_log_params)
 
     if @qc_log.save
       unless User.current.admin?
@@ -187,6 +185,53 @@ class QcLogsApiController < ApplicationController
 
   private
 
+  def qc_log_params
+      params.permit(
+        :date,
+        :environmental_description,
+        :substrate_square_footage,
+        :substrate_equipment,
+        :substrate_surface_preparation_standard,
+        :substrate_profile,
+        :substrate,
+        :substrate_media,
+        :substrate_general_comments,
+        :user_id,
+        :user_id,
+        :project_id,
+        :approved_applicator,
+        :square_footage,
+        :location_name,
+        :location_latitude,
+        :location_longitude,
+        :bridge_id,
+        :bridge_name,
+        :environmental_conditions,
+        :primer_product,
+        :primer_lot_a_number,
+        :primer_lot_a_temperature,
+        :primer_lot_b_number,
+        :primer_lot_b_temperature,
+        :primer_gallons_used,
+        :primer_application_equipment,
+        :primer_spray_gun,
+        :primer_spray_module,
+        :primer_comments,
+        :spray_membrane_application,
+        :application_thickness_instrument,
+        :application_thickness_method,
+        :application_value_and_location,
+        :adhesion_testing_instrument,
+        :adhesion_testing_method,
+        :adhesion_testing_value_and_mode,
+        :general_application_comments,
+        :sample_retained,
+        :sample_quantity,
+        :sample_date,
+        :sample_sent_by,
+        :signature
+        )
+    end
 
   # # Delete @project
   # def destroy
