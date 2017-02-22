@@ -52,6 +52,11 @@ class QcLogsApiController < ApplicationController
   # end
 
   def create
+    # Parse the text date so it actually saves as a date
+    if params["qc_log"].present? && params["qc_log"]["date"].present?
+      params["qc_log"]["date"] = Date.strptime(params["qc_log"]["date"], "%m/%d/%Y")
+    end
+
     @qc_log = QcLog.new(qc_log_params)
 
     if @qc_log.save
@@ -186,7 +191,7 @@ class QcLogsApiController < ApplicationController
   private
 
   def qc_log_params
-      params.permit(
+      params.require(:qc_log).permit(
         :date,
         :environmental_description,
         :substrate_square_footage,
@@ -206,7 +211,6 @@ class QcLogsApiController < ApplicationController
         :location_longitude,
         :bridge_id,
         :bridge_name,
-        :environmental_conditions,
         :primer_product,
         :primer_lot_a_number,
         :primer_lot_a_temperature,
@@ -220,16 +224,17 @@ class QcLogsApiController < ApplicationController
         :spray_membrane_application,
         :application_thickness_instrument,
         :application_thickness_method,
-        :application_value_and_location,
         :adhesion_testing_instrument,
         :adhesion_testing_method,
-        :adhesion_testing_value_and_mode,
         :general_application_comments,
         :sample_retained,
         :sample_quantity,
         :sample_date,
         :sample_sent_by,
-        :signature
+        :signature,
+        :environmental_conditions => [:time, :temperature, :humidity, :wind_velocity, :substrate_temperature, :substrate_moisture, :dew_point], 
+        :adhesion_testing_value_and_mode => [:value, :mode_of_failure], 
+        :application_value_and_location  => [:value, :location]
         )
     end
 
