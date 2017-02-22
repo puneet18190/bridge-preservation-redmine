@@ -1,6 +1,5 @@
 <div class="container" role="main">
   <h1>QC Logs  &nbsp; </h1>
-  <%= params %>
   <div class="table-responsive">
     <table class="table table-striped table-middle-align">
       <thead>
@@ -14,9 +13,8 @@
       </thead>
       <tbody>
         <% @qc_logs.each do |log| %>
-          <tr><%log.each_value do |item|%>
-                <td><%= item %></td>
-              <% end %></tr>
+          <tr><% log.attributes.each do |key, value| %>
+                <td><%= value %></td><% end %></tr>
         <% end %>
       </tbody>
     </table>

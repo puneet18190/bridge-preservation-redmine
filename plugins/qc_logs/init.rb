@@ -6,6 +6,6 @@ Redmine::Plugin.register :qc_logs do
   url 'http://www.Chepri.com/'
   author_url 'http://www.chepri.com/'
 
-  permission :view_qc_logs, qc_logs: :index
+  permission :view_qc_logs, qc_logs: [:index, :show]
   menu :project_menu, :qc_logs, { controller: 'qc_logs', action: 'index' }, caption: 'QC Logs', last: true, param: :project_id
 end
