@@ -5,3 +5,4 @@ get '/qc_logs_api/qc_logs', to: 'qc_logs_api#index'
 post 'qc_logs_api/qc_logs', to: 'qc_logs_api#create'
 
 delete '/user_sessions', to:  'user_sessions_api#destroy'
+get '/user_sessions/logged_in', to: 'user_sessions_api#logged_in'
