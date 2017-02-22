@@ -6,7 +6,7 @@ class QcLogsApiController < ApplicationController
   menu_item :overview
   menu_item :settings, :only => :settings
 
-  before_filter :find_project, :except => [ :index, :list, :new, :create, :copy ]
+#  before_filter :find_project, :except => [ :index, :list, :new, :create, :copy ]
   before_filter ->(controller='qc_logs', action=params[:action] ){authorize(controller, action, true)}, :except => [:list, :new, :create, :copy, :archive, :unarchive, :destroy]
   before_filter :authorize_global, :only => [:new, :create]
   before_filter :require_admin, :only => [ :copy, :archive, :unarchive, :destroy ]
@@ -21,7 +21,7 @@ class QcLogsApiController < ApplicationController
   end
 
   helper :custom_fields
-  helper :issues
+  # helper :issues
   helper :queries
   helper :repositories
   helper :members
@@ -70,6 +70,7 @@ class QcLogsApiController < ApplicationController
   end
 
   def show
+    byebug
     @qc_log = QcLog.find(params[:id])
     render json: { qc_log: @qc_log }
   end
@@ -77,7 +78,7 @@ class QcLogsApiController < ApplicationController
   def update
     @qc_log = QcLog.find(params[:id])
     @qc_log.update_attributes(qc_log_params)
-    if @qc_log.saveca
+    if @qc_log.save
       unless User.current.admin?
         @qc_log.add_default_member(User.current)
       end
@@ -85,6 +86,11 @@ class QcLogsApiController < ApplicationController
     else
       render json:  { qc_log: render_validation_errors(@qc_log) }
     end
+  end
+
+  def destroy
+    @qc_log = QcLog.find(params[:id])
+    @qc_log.destroy
   end
 
   # def copy
@@ -250,8 +256,8 @@ class QcLogsApiController < ApplicationController
         :sample_date,
         :sample_sent_by,
         :signature,
-        :environmental_conditions => [:time, :temperature, :humidity, :wind_velocity, :substrate_temperature, :substrate_moisture, :dew_point], 
-        :adhesion_testing_value_and_mode => [:value, :mode_of_failure], 
+        :environmental_conditions => [:time, :temperature, :humidity, :wind_velocity, :substrate_temperature, :substrate_moisture, :dew_point],
+        :adhesion_testing_value_and_mode => [:value, :mode_of_failure],
         :application_value_and_location  => [:value, :location]
         )
     end
