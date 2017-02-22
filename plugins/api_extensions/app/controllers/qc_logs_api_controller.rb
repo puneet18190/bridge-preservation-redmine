@@ -6,7 +6,7 @@ class QcLogsApiController < ApplicationController
   menu_item :overview
   menu_item :settings, :only => :settings
 
-  before_filter :find_project, :except => [ :index, :list, :new, :create, :copy ]
+#  before_filter :find_project, :except => [ :index, :list, :new, :create, :copy ]
   before_filter ->(controller='qc_logs', action=params[:action] ){authorize(controller, action, true)}, :except => [:list, :new, :create, :copy, :archive, :unarchive, :destroy]
   before_filter :authorize_global, :only => [:new, :create]
   before_filter :require_admin, :only => [ :copy, :archive, :unarchive, :destroy ]
@@ -21,7 +21,7 @@ class QcLogsApiController < ApplicationController
   end
 
   helper :custom_fields
-  helper :issues
+  # helper :issues
   helper :queries
   helper :repositories
   helper :members
@@ -69,26 +69,36 @@ class QcLogsApiController < ApplicationController
       end
       render json:  { qc_log: @qc_log }
     else
-      render json:  { qc_log: render_validation_errors(@qc_log) }
+      render json:  { qc_log: render_validation_errors(@qc_log) }, status: :unprocessable_entity
     end
   end
 
   def show
+    byebug
     @qc_log = QcLog.find(params[:id])
     render json: { qc_log: @qc_log }
   end
 
   def update
     @qc_log = QcLog.find(params[:id])
-    @qc_log.update_attributes(qc_log_params)
-    if @qc_log.save
+    if @qc_log.update_attributes(qc_log_params)
       unless User.current.admin?
         @qc_log.add_default_member(User.current)
       end
       render json:  { qc_log: @qc_log }
     else
-      render json:  { qc_log: render_validation_errors(@qc_log) }
+      render json:  { qc_log: render_validation_errors(@qc_log) }, status: :unprocessable_entity
     end
+  end
+
+  def destroy
+    begin
+      qc_log = QcLog.find(params[:id])
+      qc_log.destroy
+
+      render json: {}, status: :no_content
+    rescue ActiveRecord::RecordNotFound
+      render :json => {}, :status => :not_found
   end
 
   # def copy

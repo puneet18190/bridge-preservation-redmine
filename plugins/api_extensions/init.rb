@@ -8,4 +8,11 @@ Redmine::Plugin.register :api_extensions do
 
   #permission :view_qc_logs, qc_logs: :index
   #menu :project_menu, :qc_logs, { controller: 'qc_logs', action: 'index' }, caption: 'QC Logs', last: true, param: :project_id
+
+
+  Rails.configuration.to_prepare do
+  
+
+   ApplicationController.send(:include, LogoutUserPatch)
+ end
 end

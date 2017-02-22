@@ -15,15 +15,19 @@ class OauthController < ApplicationController
   end
 
   def user_info
+    
     user_hash = { :user => {} }
     user = User.find(session[:user_id])
+    
     if user
       hash = user.attributes
       hash.delete(:hashed_password)
       hash.delete(:salt)
       hash.merge!(:mail => user.mail)
       hash.merge!(:api_key => user.api_key) 
+      hash.merge!(:session => session[:tk])
       user_hash = { :user => hash }
+
     end
     respond_to do |format|
       format.json { render :json => user_hash }
@@ -45,7 +49,7 @@ class OauthController < ApplicationController
   alias_method_chain :authorize, :allow
 
    def authorize
-        if params[:oauth_token] || true
+        if params[:oauth_token] 
           @token = ::RequestToken.find_by_token! params[:oauth_token] rescue nil
           oauth1_authorize
         else

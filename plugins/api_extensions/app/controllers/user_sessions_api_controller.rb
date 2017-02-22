@@ -11,8 +11,8 @@ class UserSessionsApiController < ApplicationController
   #before_filter :authorize_global, :only => [:new, :create]
   #before_filter :require_admin, :only => [ :copy, :archive, :unarchive, :destroy ]
   #accept_rss_auth :index
-  accept_api_auth :destroy
-  before_filter :ensure_api_key 
+  accept_api_auth :destroy, :logged_in
+  before_filter :ensure_api_key
   #require_sudo_mode :destroy
 
   # after_filter :only => [:create, :edit, :update, :archive, :unarchive, :destroy] do |controller|
@@ -27,16 +27,23 @@ class UserSessionsApiController < ApplicationController
   #helper :repositories
   #helper :member
 
+  #used so client application can determine if user has valid sessions
+  def logged_in
+    
+    tokens = Token.where(user_id: User.current.id, action: 'session', value: params[:redmine_session]).select{|c| !c.expired? }
+    is_logged_in = tokens.count > 0
+    render json: is_logged_in
+  end
 
   def destroy
-    
+
     Token.where(user_id: User.current.id, action: 'session').destroy_all
-    
+
     render :nothing => true, :status => 200
   end
 
 
-  private 
+  private
 
   def ensure_api_key
    if User.current.is_a?(AnonymousUser)
