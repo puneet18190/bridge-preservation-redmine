@@ -69,6 +69,24 @@ class QcLogsApiController < ApplicationController
     end
   end
 
+  def show
+    @qc_log = QcLog.find(params[:id])
+    render json: { qc_log: @qc_log }
+  end
+
+  def update
+    @qc_log = QcLog.find(params[:id])
+    @qc_log.update_attributes(qc_log_params)
+    if @qc_log.saveca
+      unless User.current.admin?
+        @qc_log.add_default_member(User.current)
+      end
+      render json:  { qc_log: @qc_log }
+    else
+      render json:  { qc_log: render_validation_errors(@qc_log) }
+    end
+  end
+
   # def copy
   #   @issue_custom_fields = IssueCustomField.sorted.to_a
   #   @trackers = Tracker.sorted.to_a
