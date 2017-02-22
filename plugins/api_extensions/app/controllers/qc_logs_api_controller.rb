@@ -65,7 +65,7 @@ class QcLogsApiController < ApplicationController
       end
       render json:  { qc_log: @qc_log }
     else
-      render json:  { qc_log: render_validation_errors(@qc_log) }
+      render json:  { qc_log: render_validation_errors(@qc_log) }, status: :unprocessable_entity
     end
   end
 
@@ -77,20 +77,24 @@ class QcLogsApiController < ApplicationController
 
   def update
     @qc_log = QcLog.find(params[:id])
-    @qc_log.update_attributes(qc_log_params)
-    if @qc_log.save
+    if @qc_log.update_attributes(qc_log_params)
       unless User.current.admin?
         @qc_log.add_default_member(User.current)
       end
       render json:  { qc_log: @qc_log }
     else
-      render json:  { qc_log: render_validation_errors(@qc_log) }
+      render json:  { qc_log: render_validation_errors(@qc_log) }, status: :unprocessable_entity
     end
   end
 
   def destroy
-    @qc_log = QcLog.find(params[:id])
-    @qc_log.destroy
+    begin
+      qc_log = QcLog.find(params[:id])
+      qc_log.destroy
+
+      render json: {}, status: :no_content
+    rescue ActiveRecord::RecordNotFound
+      render :json => {}, :status => :not_found
   end
 
   # def copy
