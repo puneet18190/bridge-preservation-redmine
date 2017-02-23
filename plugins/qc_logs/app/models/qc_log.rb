@@ -4,4 +4,29 @@ class QcLog < ActiveRecord::Base
   belongs_to :user
   scope :visible, lambda {|*args| joins(:project).where(Project.allowed_to_condition(args.shift || User.current, :view_qc_logs)) }
 
-end
+  #define partial match text searches for text columns
+  columns.map(&:name).uniq.each do |s|
+
+    scope "with_".concat(s).concat("_like").to_sym, -> (param){where("#{table_name}.#{s} ILIKE ?", "%#{param.downcase}%")} if [:string, :text].include?(column_for_attribute(s).type)
+  end
+
+  #association searches
+
+  self.reflect_on_all_associations.map(&:name).each do |s| 
+    s = s.to_s
+    assoc_table_name = s.classify.constantize.table_name
+    scope "has_".concat(s).concat("_with_id").to_sym, -> (id){includes(s.to_sym).where("#{assoc_table_name}.id = ?", id).references(assoc_table_name) }
+  end
+
+
+
+  def self.text_search(params)
+    scope = self.where(nil)
+    params.each do |key, value|
+      search_key = "with_#{key}_like".to_sym
+      scope = scope.send(search_key, value) if scope.respond_to?(search_key)
+    end
+    return scope
+  end
+ end
+
