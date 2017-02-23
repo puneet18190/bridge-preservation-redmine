@@ -31,13 +31,13 @@ class QcLogsApiController < ApplicationController
  def index
     scope = QcLog.visible
 
-    @offset, @limit = api_offset_and_limit
-    @qc_log_count = scope.count
-    @qc_logs = scope.offset(@offset).limit(@limit).to_a
+    offset, limit = api_offset_and_limit
+    qc_log_count = scope.count
+    qc_logs = scope.offset(offset).limit(limit).to_a
     #included_data = params[:include].split(',') rescue []
     #include_activities = included_data.include?('activities')
 
-    render json:  @qc_logs
+    render json:  qc_logs
     #render json: {projects: ActiveModel::Serializer::CollectionSerializer
     #  .new(@projects, serializer: ActiveModel::Serializer::ProjectSerializer, include_activities: include_activities, user: User.current, from: Date.today - 5.days, to: Date.today, limit: 5) }
 
@@ -61,33 +61,32 @@ class QcLogsApiController < ApplicationController
       params["qc_log"]["project"] = Project.find(params["qc_log"]["project_id"].to_i)
     end
 
-    @qc_log = QcLog.new(qc_log_params)
+    qc_log = QcLog.new(qc_log_params)
 
-    if @qc_log.save
+    if qc_log.save
       unless User.current.admin?
-        @qc_log.add_default_member(User.current)
+        qc_log.add_default_member(User.current)
       end
-      render json:  { qc_log: @qc_log }
+      render json:  { qc_log: qc_log }
     else
-      render json:  { qc_log: render_validation_errors(@qc_log) }, status: :unprocessable_entity
+      render json:  { qc_log: render_validation_errors(qc_log) }, status: :unprocessable_entity
     end
   end
 
   def show
-    byebug
-    @qc_log = QcLog.find(params[:id])
-    render json: { qc_log: @qc_log }
+    qc_log = QcLog.find(params[:id])
+    render json: { qc_log: qc_log }
   end
 
   def update
-    @qc_log = QcLog.find(params[:id])
-    if @qc_log.update_attributes(qc_log_params)
+    qc_log = QcLog.find(params[:id])
+    if qc_log.update_attributes(qc_log_params)
       unless User.current.admin?
-        @qc_log.add_default_member(User.current)
+        qc_log.add_default_member(User.current)
       end
-      render json:  { qc_log: @qc_log }
+      render json:  { qc_log: qc_log }
     else
-      render json:  { qc_log: render_validation_errors(@qc_log) }, status: :unprocessable_entity
+      render json:  { qc_log: render_validation_errors(qc_log) }, status: :unprocessable_entity
     end
   end
 
@@ -266,8 +265,8 @@ class QcLogsApiController < ApplicationController
         :sample_sent_by,
         :signature,
         :spray_membrane_application => [:product, :lot_a_number, :lot_a_temperature, :lot_b_number, :lot_b_temperature, :no_gallons_used, :application_equipment, :spray_gun, :spray_module, :set_iso, :set_resin, :set_hose, :temperature_iso, :temperature_resin, :temperature_hose, :pressure_set, :pressure_spray],
-        :environmental_conditions => [:time, :temperature, :humidity, :wind_velocity, :substrate_temperature, :substrate_moisture, :dew_point], 
-        :adhesion_testing_value_and_mode => [:value, :mode_of_failure], 
+        :environmental_conditions => [:time, :temperature, :humidity, :wind_velocity, :substrate_temperature, :substrate_moisture, :dew_point],
+        :adhesion_testing_value_and_mode => [:value, :mode_of_failure],
         :application_value_and_location  => [:value, :location]
         )
     end
