@@ -19,12 +19,12 @@ class ProjectSerializer < ActiveModel::Serializer
       e_hash = e.attributes 
       e_hash[:event_type] = e.event_type
       e_hash[:event_datetime] = e.event_datetime
-      e_hash[:event_author] = e.event_author.attributes.slice("firstname", "lastname", "id") rescue {}
+      e_hash[:event_author] = e.event_author.attributes.slice("firstname", "lastname", "id") rescue {"firstname": "", "lastname": "", "id": ""}
       e_hash[:event_description] = e.event_description
       e_hash[:event_group] = e.event_group
       e_hash[:event_url] = url_for(e.event_url.merge(:only_path => true)) rescue ""
       e_hash[:event_title] = e.event_title
-
+      
       events << e_hash
      end
     end
