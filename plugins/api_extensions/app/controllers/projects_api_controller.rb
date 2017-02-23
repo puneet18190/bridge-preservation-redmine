@@ -35,7 +35,6 @@ class ProjectsApiController < ApplicationController
     @offset, @limit = api_offset_and_limit
     @project_count = scope.count
     @projects = scope.offset(@offset).limit(@limit).to_a
-
     included_data = params[:include].split(',') rescue []
 
     include_activities = included_data.include?('activities')
