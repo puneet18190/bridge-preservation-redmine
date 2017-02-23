@@ -31,6 +31,7 @@ class QcLogsApiController < ApplicationController
  def index
     scope = QcLog.visible
 
+    scope = search_filter(scope)
     @offset, @limit = api_offset_and_limit
     @qc_log_count = scope.count
     @qc_logs = scope.offset(@offset).limit(@limit).to_a
@@ -102,126 +103,17 @@ class QcLogsApiController < ApplicationController
     end
   end
 
-  # def copy
-  #   @issue_custom_fields = IssueCustomField.sorted.to_a
-  #   @trackers = Tracker.sorted.to_a
-  #   @source_project = Project.find(params[:id])
-  #   if request.get?
-  #     @project = Project.copy_from(@source_project)
-  #     @project.identifier = Project.next_identifier if Setting.sequential_project_identifiers?
-  #   else
-  #     Mailer.with_deliveries(params[:notifications] == '1') do
-  #       @project = Project.new
-  #       @project.safe_attributes = params[:project]
-  #       if @project.copy(@source_project, :only => params[:only])
-  #         flash[:notice] = l(:notice_successful_create)
-  #         redirect_to settings_project_path(@project)
-  #       elsif !@project.new_record?
-  #         # Project was created
-  #         # But some objects were not copied due to validation failures
-  #         # (eg. issues from disabled trackers)
-  #         # TODO: inform about that
-  #         redirect_to settings_project_path(@project)
-  #       end
-  #     end
-  #   end
-  # rescue ActiveRecord::RecordNotFound
-  #   # source_project not found
-  #   render_404
-  # end
-
-  # # Show @project
-  # def show
-  #   # try to redirect to the requested menu item
-  #   if params[:jump] && redirect_to_project_menu_item(@project, params[:jump])
-  #     return
-  #   end
-
-  #   @users_by_role = @project.users_by_role
-  #   @subprojects = @project.children.visible.to_a
-  #   @news = @project.news.limit(5).includes(:author, :project).reorder("#{News.table_name}.created_on DESC").to_a
-  #   @trackers = @project.rolled_up_trackers.visible
-
-  #   cond = @project.project_condition(Setting.display_subprojects_issues?)
-
-  #   @open_issues_by_tracker = Issue.visible.open.where(cond).group(:tracker).count
-  #   @total_issues_by_tracker = Issue.visible.where(cond).group(:tracker).count
-
-  #   if User.current.allowed_to_view_all_time_entries?(@project)
-  #     @total_hours = TimeEntry.visible.where(cond).sum(:hours).to_f
-  #   end
-
-  #   @key = User.current.rss_key
-
-  #   respond_to do |format|
-  #     format.html
-  #     format.api
-  #   end
-  # end
-
-  # def settings
-  #   @issue_custom_fields = IssueCustomField.sorted.to_a
-  #   @issue_category ||= IssueCategory.new
-  #   @member ||= @project.members.new
-  #   @trackers = Tracker.sorted.to_a
-  #   @wiki ||= @project.wiki || Wiki.new(:project => @project)
-  # end
-
-  # def edit
-  # end
-
-  # def update
-  #   @project.safe_attributes = params[:project]
-  #   if @project.save
-  #     respond_to do |format|
-  #       format.html {
-  #         flash[:notice] = l(:notice_successful_update)
-  #         redirect_to settings_project_path(@project)
-  #       }
-  #       format.api  { render_api_ok }
-  #     end
-  #   else
-  #     respond_to do |format|
-  #       format.html {
-  #         settings
-  #         render :action => 'settings'
-  #       }
-  #       format.api  { render_validation_errors(@project) }
-  #     end
-  #   end
-  # end
-
-  # def modules
-  #   @project.enabled_module_names = params[:enabled_module_names]
-  #   flash[:notice] = l(:notice_successful_update)
-  #   redirect_to settings_project_path(@project, :tab => 'modules')
-  # end
-
-  # def archive
-  #   unless @project.archive
-  #     flash[:error] = l(:error_can_not_archive_project)
-  #   end
-  #   redirect_to admin_projects_path(:status => params[:status])
-  # end
-
-  # def unarchive
-  #   unless @project.active?
-  #     @project.unarchive
-  #   end
-  #   redirect_to admin_projects_path(:status => params[:status])
-  # end
-
-  # def close
-  #   @project.close
-  #   redirect_to project_path(@project)
-  # end
-
-  # def reopen
-  #   @project.reopen
-  #   redirect_to project_path(@project)
-  # end
+ 
 
   private
+
+  def search_filter(scope)
+    filter_params = JSON.parse(params[:filters])
+    scope = scope.has_project_with_id(params[:project_id])
+    scope = scope.text_search(filter_params) if filter_params.is_a?(Hash)
+    return scope
+
+  end
 
   def qc_log_params
       params.require(:qc_log).permit(
