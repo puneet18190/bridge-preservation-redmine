@@ -58,6 +58,10 @@ class QcLogsApiController < ApplicationController
       params["qc_log"]["date"] = Date.strptime(params["qc_log"]["date"], "%m/%d/%Y")
     end
 
+    if params["qc_log"].present? && params["qc_log"]["sample_date"].present?
+      params["qc_log"]["sample_date"] = Date.strptime(params["qc_log"]["sample_date"], "%m/%d/%Y")
+    end
+
     if params["qc_log"].present? && params["qc_log"]["project_id"].present?
       params["qc_log"]["project"] = Project.find(params["qc_log"]["project_id"].to_i)
     end
@@ -126,7 +130,6 @@ class QcLogsApiController < ApplicationController
         :substrate,
         :substrate_media,
         :substrate_general_comments,
-        :user_id,
         :user_id,
         :project,
         :project_id,
