@@ -32,15 +32,20 @@ class ProjectSerializer < ActiveModel::Serializer
   end
 
   def custom_fields
-    fields = CustomValue.where(customized_type: 'Project').where(customized_id: object.id).includes(:custom_field)
-    return fields.map{|m| 
-      {
-        :id => m.id,
-        :name => m.custom_field.name,
-        :value => m.value,
+    custom_fields = ProjectCustomField.all
+    custom_field_hash = {}
+    #fields = CustomValue.where(customized_type: 'Project').where(customized_id: object.id).includes(:custom_field)
+   custom_fields.each do |m| 
+    custom_value = CustomValue.where(customized_type: 'Project', custom_field_id: m.id).where(customized_id: object.id).first ||  CustomValue.new
+      custom_field_hash[m.name.to_sym] = {
+        :id => custom_value.id,
+        :value => custom_value.value
+       }
 
-      }
-    }
+    end
+    return custom_field_hash
+
+
 
   end
 

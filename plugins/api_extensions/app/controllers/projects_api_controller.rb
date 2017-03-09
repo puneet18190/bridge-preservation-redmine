@@ -30,7 +30,9 @@ class ProjectsApiController < ApplicationController
 
   # Lists visible projects
  def index
+
     scope = Project.visible.sorted
+    scope = all_search_filters(scope)
 
     @offset, @limit = api_offset_and_limit
     @project_count = scope.count
@@ -43,188 +45,47 @@ class ProjectsApiController < ApplicationController
     render json: {projects: ActiveModel::Serializer::CollectionSerializer
       .new(@projects, serializer: ActiveModel::Serializer::ProjectSerializer, include_activities: include_activities, 
         user: User.current,  from: (Date.today - 5.days).to_datetime, to: Date.tomorrow.to_datetime, limit: 5) }
+ end
 
+
+  private 
+
+  def all_search_filters(scope)
+    scope = search_filter(scope)
+    scope = custom_field_search_filter(scope)
+  end
+
+  def search_filter(scope)
+    filter_params = params[:filters]
+    scope = scope.has_project_with_id(params[:project_id]) if params[:project_id]
+    scope = scope.text_search(filter_params) if filter_params.is_a?(Hash)
+    return scope
 
   end
 
+  def custom_field_search_filter(scope)
+    project_ids = []
+    scope_ids = scope.ids
+    filter_params = params[:filters] || {}
+    filter_params = filter_params.reject{|k, v| v.blank? }
+    custom_fields_filters = filter_params.keys.map{|m| m.downcase} rescue []
+    custom_fields =  ProjectCustomField.where('lower(name) in (?)', custom_fields_filters)
+    custom_fields.each do |c| 
 
-  private 
+      filter_value = filter_params[c.name.downcase.to_sym] 
 
-  # def set_current_user
-  #   t = Token.find_by(value: params[:key], action: 'api')
-  #   @user = User.find(t.user_id)
-  # end
+      unless  c.name == "Owner" 
+        new_ids  = CustomValue.where(customized_type: 'Project', customized_id: scope_ids, custom_field_id: c.id).
+                      where('value ILIKE ?', "%#{filter_value}%").pluck(:customized_id)
+      else 
+        filter_value = Contact.where('first_name ILIKE ?', "%#{filter_value}%").ids.map(&:to_s)
+        new_ids = CustomValue.where(customized_type: 'Project', customized_id: scope_ids, custom_field_id: c.id).
+                      where('value IN (?)', filter_value).pluck(:customized_id)
+      end
+      scope_ids = scope_ids.select{|m| new_ids.include?(m)}
+    end
+    return scope.where(id: scope_ids)
+  end
 
-  # def new
-  #   @issue_custom_fields = IssueCustomField.sorted.to_a
-  #   @trackers = Tracker.sorted.to_a
-  #   @project = Project.new
-  #   @project.safe_attributes = params[:project]
-  # end
 
-  # def create
-  #   @issue_custom_fields = IssueCustomField.sorted.to_a
-  #   @trackers = Tracker.sorted.to_a
-  #   @project = Project.new
-  #   @project.safe_attributes = params[:project]
-
-  #   if @project.save
-  #     unless User.current.admin?
-  #       @project.add_default_member(User.current)
-  #     end
-  #     respond_to do |format|
-  #       format.html {
-  #         flash[:notice] = l(:notice_successful_create)
-  #         if params[:continue]
-  #           attrs = {:parent_id => @project.parent_id}.reject {|k,v| v.nil?}
-  #           redirect_to new_project_path(attrs)
-  #         else
-  #           redirect_to settings_project_path(@project)
-  #         end
-  #       }
-  #       format.api  { render :action => 'show', :status => :created, :location => url_for(:controller => 'projects', :action => 'show', :id => @project.id) }
-  #     end
-  #   else
-  #     respond_to do |format|
-  #       format.html { render :action => 'new' }
-  #       format.api  { render_validation_errors(@project) }
-  #     end
-  #   end
-  # end
-
-  # def copy
-  #   @issue_custom_fields = IssueCustomField.sorted.to_a
-  #   @trackers = Tracker.sorted.to_a
-  #   @source_project = Project.find(params[:id])
-  #   if request.get?
-  #     @project = Project.copy_from(@source_project)
-  #     @project.identifier = Project.next_identifier if Setting.sequential_project_identifiers?
-  #   else
-  #     Mailer.with_deliveries(params[:notifications] == '1') do
-  #       @project = Project.new
-  #       @project.safe_attributes = params[:project]
-  #       if @project.copy(@source_project, :only => params[:only])
-  #         flash[:notice] = l(:notice_successful_create)
-  #         redirect_to settings_project_path(@project)
-  #       elsif !@project.new_record?
-  #         # Project was created
-  #         # But some objects were not copied due to validation failures
-  #         # (eg. issues from disabled trackers)
-  #         # TODO: inform about that
-  #         redirect_to settings_project_path(@project)
-  #       end
-  #     end
-  #   end
-  # rescue ActiveRecord::RecordNotFound
-  #   # source_project not found
-  #   render_404
-  # end
-
-  # # Show @project
-  # def show
-  #   # try to redirect to the requested menu item
-  #   if params[:jump] && redirect_to_project_menu_item(@project, params[:jump])
-  #     return
-  #   end
-
-  #   @users_by_role = @project.users_by_role
-  #   @subprojects = @project.children.visible.to_a
-  #   @news = @project.news.limit(5).includes(:author, :project).reorder("#{News.table_name}.created_on DESC").to_a
-  #   @trackers = @project.rolled_up_trackers.visible
-
-  #   cond = @project.project_condition(Setting.display_subprojects_issues?)
-
-  #   @open_issues_by_tracker = Issue.visible.open.where(cond).group(:tracker).count
-  #   @total_issues_by_tracker = Issue.visible.where(cond).group(:tracker).count
-
-  #   if User.current.allowed_to_view_all_time_entries?(@project)
-  #     @total_hours = TimeEntry.visible.where(cond).sum(:hours).to_f
-  #   end
-
-  #   @key = User.current.rss_key
-
-  #   respond_to do |format|
-  #     format.html
-  #     format.api
-  #   end
-  # end
-
-  # def settings
-  #   @issue_custom_fields = IssueCustomField.sorted.to_a
-  #   @issue_category ||= IssueCategory.new
-  #   @member ||= @project.members.new
-  #   @trackers = Tracker.sorted.to_a
-  #   @wiki ||= @project.wiki || Wiki.new(:project => @project)
-  # end
-
-  # def edit
-  # end
-
-  # def update
-  #   @project.safe_attributes = params[:project]
-  #   if @project.save
-  #     respond_to do |format|
-  #       format.html {
-  #         flash[:notice] = l(:notice_successful_update)
-  #         redirect_to settings_project_path(@project)
-  #       }
-  #       format.api  { render_api_ok }
-  #     end
-  #   else
-  #     respond_to do |format|
-  #       format.html {
-  #         settings
-  #         render :action => 'settings'
-  #       }
-  #       format.api  { render_validation_errors(@project) }
-  #     end
-  #   end
-  # end
-
-  # def modules
-  #   @project.enabled_module_names = params[:enabled_module_names]
-  #   flash[:notice] = l(:notice_successful_update)
-  #   redirect_to settings_project_path(@project, :tab => 'modules')
-  # end
-
-  # def archive
-  #   unless @project.archive
-  #     flash[:error] = l(:error_can_not_archive_project)
-  #   end
-  #   redirect_to admin_projects_path(:status => params[:status])
-  # end
-
-  # def unarchive
-  #   unless @project.active?
-  #     @project.unarchive
-  #   end
-  #   redirect_to admin_projects_path(:status => params[:status])
-  # end
-
-  # def close
-  #   @project.close
-  #   redirect_to project_path(@project)
-  # end
-
-  # def reopen
-  #   @project.reopen
-  #   redirect_to project_path(@project)
-  # end
-
-  private 
-
-  
-  # # Delete @project
-  # def destroy
-  #   @project_to_destroy = @project
-  #   if api_request? || params[:confirm]
-  #     @project_to_destroy.destroy
-  #     respond_to do |format|
-  #       format.html { redirect_to admin_projects_path }
-  #       format.api  { render_api_ok }
-  #     end
-  #   end
-  #   # hide project in layout
-  #   @project = nil
-  # end
 end

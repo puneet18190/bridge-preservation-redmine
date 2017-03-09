@@ -24,7 +24,7 @@ class QcLog < ActiveRecord::Base
     scope = self.where(nil)
     params.each do |key, value|
       search_key = "with_#{key}_like".to_sym
-      scope = scope.send(search_key, value) if scope.respond_to?(search_key)
+      scope = scope.send(search_key, value) if scope.respond_to?(search_key) && !value.blank?
     end
     return scope
   end
