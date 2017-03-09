@@ -1,0 +1,7 @@
+# Russian strings go here for Rails i18n
+ru:
+  rum_label_settings_min_chars_for_search: 'Минимальное количество символов для начала поиска'
+  rum_label_settings_fields_with_mentions: 'Поля для использования упоминаний'
+  rum_label_settings_mentions_magic_char: 'Символ для активации упоминаний'
+  rum_label_settings_mentions_myself_link: 'Упоминание о себе'
+  rum_label_not_found_user: 'Упоминаемый сотрудник не найден'
