@@ -34,6 +34,7 @@ class Api::QcLogsApiController < API::ApplicationController
     scope = search_filter(scope)
     offset, limit = api_offset_and_limit
     qc_log_count = scope.count
+
     qc_logs = scope.offset(offset).limit(limit).to_a
     #included_data = params[:include].split(',') rescue []
     #include_activities = included_data.include?('activities')
@@ -111,8 +112,11 @@ class Api::QcLogsApiController < API::ApplicationController
   private
 
   def search_filter(scope)
-    filter_params = params[:filters]
-    scope = scope.has_project_with_id(params[:project_id]) if params[:project_id]
+    filter_params = params[:filters] || {}
+    filter_params = filter_params.reject{|k, v|  v.blank? }
+    scope = scope.has_project_with_id(filter_params[:project_id]) if filter_params[:project_id] 
+    scope =  scope.has_user_with_id(filter_params[:user_id]) if filter_params[:user_id]
+    scope = scope.with_date_between(filter_params[:from_date], filter_params[:to_date]) if filter_params[:from_date] || filter_params[:to_date]
     scope = scope.text_search(filter_params) if filter_params.is_a?(Hash)
     return scope
 

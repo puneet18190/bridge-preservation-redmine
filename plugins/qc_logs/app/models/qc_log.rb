@@ -8,7 +8,15 @@ class QcLog < ActiveRecord::Base
   columns.map(&:name).uniq.each do |s|
 
     scope "with_".concat(s).concat("_like").to_sym, -> (param){where("#{table_name}.#{s} ILIKE ?", "%#{param.downcase}%")} if [:string, :text].include?(column_for_attribute(s).type)
+    scope "with_".concat(s).concat('_between').to_sym, -> (from=Date.today, to = nil)  {
+      params = {}
+      params[:from] = from
+      params[:to] = to if to 
+      second_clause = "AND #{table_name}.#{s} <= :to" if params[:to]
+      where("#{table_name}.#{s} >=  :from #{second_clause} ", params)} if [:date, :datetime].include?(column_for_attribute(s).type)
   end
+
+
 
   #association searches
 
@@ -29,4 +37,3 @@ class QcLog < ActiveRecord::Base
     return scope
   end
  end
-
