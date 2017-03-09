@@ -5,16 +5,28 @@
       <thead>
         <tr>
           <th>Date</th>
-          <th>Owner</th>
           <th>Applicator</th>
           <th>Created By</th>
+          <th>Status</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         <% @qc_logs.each do |log| %>
-          <tr><% log.attributes.each do |key, value| %>
-                <td><%= value %></td><% end %></tr>
+          <tr>
+            <td>
+              <%= log["date"] %>
+            </td>
+            <td>
+              <%= log["approved_applicator"] %>
+            </td>
+            <td>
+              <%= User.find(log["user_id"]).name %>
+            </td>
+            <td>
+              <%= log["status"] %>
+            </td>
+          </tr>
         <% end %>
       </tbody>
     </table>
