@@ -1,8 +1,7 @@
-class ProjectsApiController < ApplicationController
+class Api::ProjectsApiController < API::ApplicationController
   
 
   unloadable
-  
   menu_item :overview
   menu_item :settings, :only => :settings
 
@@ -34,14 +33,15 @@ class ProjectsApiController < ApplicationController
     scope = Project.visible.sorted
     scope = all_search_filters(scope)
 
-    @offset, @limit = api_offset_and_limit
-    @project_count = scope.count
-    @projects = scope.offset(@offset).limit(@limit).to_a
+    #@offset, @limit = api_offset_and_limit
+    #@project_count = scope.count
+   # @projects = scope.offset(@offset).limit(@limit).to_a
     included_data = params[:include].split(',') rescue []
+    
 
     include_activities = included_data.include?('activities')
-  
-
+    
+    @projects = paginate scope, per_page: params[:per_page], page: params[:page]
     render json: {projects: ActiveModel::Serializer::CollectionSerializer
       .new(@projects, serializer: ActiveModel::Serializer::ProjectSerializer, include_activities: include_activities, 
         user: User.current,  from: (Date.today - 5.days).to_datetime, to: Date.tomorrow.to_datetime, limit: 5) }

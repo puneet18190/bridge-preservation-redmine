@@ -60,6 +60,25 @@ module RedmineApp
     # Verify validity of user sessions
     config.redmine_verify_sessions = true
 
+
+    config.middleware.insert_before 0, "Rack::Cors", :debug => true, :logger => (-> { Rails.logger }) do
+        allow do
+          origins '*'
+
+          resource '/cors',
+            :headers => :any,
+            :methods => [:post],
+            :credentials => true,
+            :max_age => 0
+
+          resource '*',
+            :headers => :any,
+            :methods => [:get, :post, :delete, :put, :patch, :options, :head],
+            :expose => ['Total','Per-Page','Link'],
+            :max_age => 0
+        end
+    end
+
     # Specific cache for search results, the default file store cache is not
     # a good option as it could grow fast. A memory store (32MB max) is used
     # as the default. If you're running multiple server processes, it's

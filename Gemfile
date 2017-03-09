@@ -42,6 +42,8 @@ end
 
 gem 'byebug'
 
+gem 'rack-cors'
+
 platforms :mri, :mingw, :x64_mingw do
   # Optional gem for exporting the gantt to a PNG file, not supported with jruby
   group :rmagick do
