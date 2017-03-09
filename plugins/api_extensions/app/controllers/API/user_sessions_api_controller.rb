@@ -1,4 +1,4 @@
-class UserSessionsApiController < ApplicationController
+class Api::UserSessionsApiController < API::ApplicationController
 
 
   unloadable

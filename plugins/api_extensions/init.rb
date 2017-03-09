@@ -15,5 +15,6 @@ Redmine::Plugin.register :api_extensions do
 
    ApplicationController.send(:include, LogoutUserPatch)
    Project.send(:include, SearchablePatch)
+   ApplicationController.send(:include, Rails::Pagination)
  end
 end
