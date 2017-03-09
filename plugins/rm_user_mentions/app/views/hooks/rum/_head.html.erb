@@ -1,0 +1,14 @@
+<script type="text/javascript">
+  RMPlus.RUM = (function (my) {
+    var my = my || {};
+    my.fields_with_mentions = '<%= Setting.plugin_rm_user_mentions['fields_with_mentions'] %>';
+    my.mentions_magic_char = '<%= Setting.plugin_rm_user_mentions['mentions_magic_char'] %>';
+    my.min_chars_for_mentions = <%= Setting.plugin_rm_user_mentions['min_chars_for_mentions'].to_s.size > 0 ? Setting.plugin_rm_user_mentions['min_chars_for_mentions'] : 3 %>;
+    my.myself_link = '<%= Setting.plugin_rm_user_mentions['mentions_myself_link'] %>';
+    return my;
+  })(RMPlus.RUM || {});
+</script>
+
+<%= javascript_include_tag 'mention/mention.js', plugin: :rm_user_mentions %>
+<%= javascript_include_tag :rum, plugin: :rm_user_mentions %>
+<%= stylesheet_link_tag :rum, plugin: :rm_user_mentions %>

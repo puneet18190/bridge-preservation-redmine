@@ -1,0 +1,28 @@
+ul.rum-mention {
+  padding: 0;
+  display: none;
+  position: absolute;
+  overflow: hidden;
+  z-index: 1100;
+  margin: 0px 0px 0px 0px;
+  background: white;
+  border: #ccc solid 1px;
+
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+}
+ul.rum-mention li {
+  color: #484848;
+  padding: 5px;
+  cursor: pointer;
+}
+ul.rum-mention li.active {
+  color: #fff;
+  background-image: url(../images/toolbar_x.png);
+  background-position: 0px -112px;
+}
+.rum-not-found {
+  font-weight: bold;
+  color: #D33;
+}

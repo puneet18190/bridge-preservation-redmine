@@ -1,0 +1,7 @@
+# Russian strings go here for Rails i18n
+en:
+  rum_label_settings_min_chars_for_search: 'Minimum number of characters to start the search'
+  rum_label_settings_fields_with_mentions: 'Fields for mentions'
+  rum_label_settings_mentions_magic_char: 'Symbol to activate mentions'
+  rum_label_settings_mentions_myself_link: 'The mention of myself'
+  rum_label_not_found_user: 'User was not found'

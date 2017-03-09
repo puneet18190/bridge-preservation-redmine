@@ -1,0 +1,52 @@
+<div style="padding: 10px;">
+
+  <table class="plugin_settings" style="width: 100%;">
+
+    <tr>
+      <td width="40%">
+        <label for="settings_min_chars_for_mentions"><%= l(:rum_label_settings_min_chars_for_search) %>:</label>
+      </td>
+      <td>
+        <%= text_field_tag 'settings[min_chars_for_mentions]', @settings['min_chars_for_mentions'] %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label for="settings_fields_with_mentions"><%= l(:rum_label_settings_fields_with_mentions) %>:</label>
+        <span class='required'>*</span>
+      </td>
+      <td>
+        <%= text_field_tag 'settings[fields_with_mentions]', @settings['fields_with_mentions'] %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label for="settings_mentions_magic_char"><%= l(:rum_label_settings_mentions_magic_char) %>:</label>
+        <span class='required'>*</span>
+      </td>
+      <td>
+        <%= text_field_tag 'settings[mentions_magic_char]', @settings['mentions_magic_char'] %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label for="settings_mentions_myself_link"><%= l(:rum_label_settings_mentions_myself_link) %>:</label>
+        <span class='required'>*</span>
+      </td>
+      <td>
+        <%= text_field_tag 'settings[mentions_myself_link]', @settings['mentions_myself_link'] %>
+      </td>
+    </tr>
+
+    <tr>
+      <td></td>
+      <td id="settings_save_button">
+        <%= render file: File.join(File.dirname(__FILE__), "_rmplus_logo.html.erb") %>
+      </td>
+    </tr>
+
+  </table>
+</div>
