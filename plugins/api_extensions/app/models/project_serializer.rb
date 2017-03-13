@@ -1,7 +1,7 @@
 class ProjectSerializer < ActiveModel::Serializer
   unloadable
 
-  attributes *Project.attribute_names, :activities, :custom_fields
+  attributes *Project.attribute_names, :activities, :custom_fields, :products
   include Rails.application.routes.url_helpers
 
  #available event methods
@@ -49,6 +49,8 @@ class ProjectSerializer < ActiveModel::Serializer
 
   end
 
-
+  def products
+    object.products
+  end
 end
 

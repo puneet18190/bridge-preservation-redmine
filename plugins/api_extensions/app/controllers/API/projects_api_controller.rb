@@ -31,7 +31,7 @@ class Api::ProjectsApiController < API::ApplicationController
  def index
 
     scope = Project.visible.sorted
-    scope = all_search_filters(scope)
+    scope = all_search_filters(scope).includes(:products)
 
     #@offset, @limit = api_offset_and_limit
     #@project_count = scope.count
@@ -40,11 +40,19 @@ class Api::ProjectsApiController < API::ApplicationController
     
 
     include_activities = included_data.include?('activities')
-    
     @projects = paginate scope, per_page: params[:per_page], page: params[:page]
     render json: {projects: ActiveModel::Serializer::CollectionSerializer
       .new(@projects, serializer: ActiveModel::Serializer::ProjectSerializer, include_activities: include_activities, 
         user: User.current,  from: (Date.today - 5.days).to_datetime, to: Date.tomorrow.to_datetime, limit: 5) }
+ end
+
+ def show 
+  scope = Project.visible.find(params[:id])
+  included_data = params[:include].split(',') rescue []
+  include_activities = included_data.include?('activities')
+
+  render json: scope, serializer: ActiveModel::Serializer::ProjectSerializer, include_activities: include_activities, 
+        user: User.current,  from: (Date.today - 5.days).to_datetime, to: Date.tomorrow.to_datetime, limit: 5
  end
 
 

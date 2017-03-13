@@ -1,4 +1,4 @@
-class QcLogsApiController < ApplicationController
+class Api::QcLogsApiController < API::ApplicationController
 
 
   unloadable
@@ -32,16 +32,12 @@ class QcLogsApiController < ApplicationController
     scope = QcLog.visible
 
     scope = search_filter(scope)
-    offset, limit = api_offset_and_limit
-    qc_log_count = scope.count
-    qc_logs = scope.offset(offset).limit(limit).to_a
+    
+    @qc_logs = paginate scope, per_page: params[:per_page], page: params[:page]
     #included_data = params[:include].split(',') rescue []
     #include_activities = included_data.include?('activities')
 
-    render json:  qc_logs
-    #render json: {projects: ActiveModel::Serializer::CollectionSerializer
-    #  .new(@projects, serializer: ActiveModel::Serializer::ProjectSerializer, include_activities: include_activities, user: User.current, from: Date.today - 5.days, to: Date.today, limit: 5) }
-
+    render json:  @qc_logs
 
   end
 
@@ -111,8 +107,11 @@ class QcLogsApiController < ApplicationController
   private
 
   def search_filter(scope)
-    filter_params = params[:filters]
-    scope = scope.has_project_with_id(params[:project_id]) if params[:project_id]
+    filter_params = params[:filters] || {}
+    filter_params = filter_params.reject{|k, v|  v.blank? }
+    scope = scope.has_project_with_id(filter_params[:project_id]) if filter_params[:project_id] 
+    scope =  scope.has_user_with_id(filter_params[:user_id]) if filter_params[:user_id]
+    scope = scope.with_date_between(filter_params[:from_date], filter_params[:to_date]) if filter_params[:from_date] || filter_params[:to_date]
     scope = scope.text_search(filter_params) if filter_params.is_a?(Hash)
     return scope
 
@@ -159,7 +158,6 @@ class QcLogsApiController < ApplicationController
         :sample_date,
         :sample_sent_by,
         :signature,
-        :status,
         :spray_membrane_application => [:product, :lot_a_number, :lot_a_temperature, :lot_b_number, :lot_b_temperature, :no_gallons_used, :application_equipment, :spray_gun, :spray_module, :set_iso, :set_resin, :set_hose, :temperature_iso, :temperature_resin, :temperature_hose, :pressure_set, :pressure_spray],
         :environmental_conditions => [:time, :temperature, :humidity, :wind_velocity, :substrate_temperature, :substrate_moisture, :dew_point],
         :adhesion_testing_value_and_mode => [:value, :mode_of_failure],
