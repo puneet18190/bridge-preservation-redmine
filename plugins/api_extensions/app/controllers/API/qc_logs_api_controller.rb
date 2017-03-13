@@ -32,17 +32,12 @@ class Api::QcLogsApiController < API::ApplicationController
     scope = QcLog.visible
 
     scope = search_filter(scope)
-    offset, limit = api_offset_and_limit
-    qc_log_count = scope.count
-
-    qc_logs = scope.offset(offset).limit(limit).to_a
+    
+    @qc_logs = paginate scope, per_page: params[:per_page], page: params[:page]
     #included_data = params[:include].split(',') rescue []
     #include_activities = included_data.include?('activities')
 
-    render json:  qc_logs
-    #render json: {projects: ActiveModel::Serializer::CollectionSerializer
-    #  .new(@projects, serializer: ActiveModel::Serializer::ProjectSerializer, include_activities: include_activities, user: User.current, from: Date.today - 5.days, to: Date.today, limit: 5) }
-
+    render json:  @qc_logs
 
   end
 
