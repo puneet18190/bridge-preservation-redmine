@@ -1,6 +1,7 @@
 class QcLogsController < ApplicationController
   unloadable
   before_action :begin_of_assocation_chain
+  before_filter :find_optional_project, :only => [:index]
 
   def index
         if params[:project_id]
