@@ -1,12 +1,13 @@
 class QcLogsController < ApplicationController
   unloadable
   before_action :begin_of_assocation_chain
+  before_filter :find_optional_project, :only => [:index]
 
   def index
         if params[:project_id]
-          return @qc_logs = @qc_logs.where(:project_id => params[:project_id])
-        else
-          return @qc_logs
+          project = Project.find_by(identifier: params[:project_id])
+          project_id = project.id
+          return @qc_logs = @qc_logs.where(:project_id => project_id)
         end
   end
 
@@ -18,7 +19,7 @@ class QcLogsController < ApplicationController
       else
         @qc_logs = QcLog.where(user_id: User.current.id)
       end
-      
+
     end
 
 end
