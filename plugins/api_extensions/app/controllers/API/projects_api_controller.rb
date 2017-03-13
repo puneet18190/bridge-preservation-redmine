@@ -47,6 +47,15 @@ class Api::ProjectsApiController < API::ApplicationController
         user: User.current,  from: (Date.today - 5.days).to_datetime, to: Date.tomorrow.to_datetime, limit: 5) }
  end
 
+ def show 
+  scope = Project.visible.find(params[:id])
+  included_data = params[:include].split(',') rescue []
+  include_activities = included_data.include?('activities')
+
+  render json: scope, serializer: ActiveModel::Serializer::ProjectSerializer, include_activities: include_activities, 
+        user: User.current,  from: (Date.today - 5.days).to_datetime, to: Date.tomorrow.to_datetime, limit: 5
+ end
+
 
   private 
 
