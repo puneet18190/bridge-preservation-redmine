@@ -54,6 +54,7 @@ class Api::QcLogsApiController < API::ApplicationController
       params["qc_log"]["date"] = Date.strptime(params["qc_log"]["date"], "%m/%d/%Y")
     end
 
+
     if params["qc_log"].present? && params["qc_log"]["sample_date"].present?
       params["qc_log"]["sample_date"] = Date.strptime(params["qc_log"]["sample_date"], "%m/%d/%Y")
     end
@@ -80,7 +81,23 @@ class Api::QcLogsApiController < API::ApplicationController
   end
 
   def update
+    if params["qc_log"].present? && params["qc_log"]["date"].present?
+      params["qc_log"]["date"] = Date.strptime(params["qc_log"]["date"], "%m/%d/%Y")
+    end
+
+    if params["qc_log"].present? && params["qc_log"]["sample_date"].present?
+      params["qc_log"]["sample_date"] = Date.strptime(params["qc_log"]["sample_date"], "%m/%d/%Y")
+    end
+
+    if params["qc_log"].present? && params["qc_log"]["project_id"].present?
+      params["qc_log"]["project"] = Project.find(params["qc_log"]["project_id"].to_i)
+    end
+
+    byebug
+
     qc_log = QcLog.find(params[:id])
+
+
     if qc_log.update_attributes(qc_log_params)
       unless User.current.admin?
         qc_log.add_default_member(User.current)
@@ -102,15 +119,13 @@ class Api::QcLogsApiController < API::ApplicationController
     end
   end
 
-
-
   private
 
   def search_filter(scope)
     filter_params = params[:filters] || {}
     filter_params = filter_params.reject{|k, v|  v.blank? }
     scope = scope.has_project_with_id(filter_params[:project_id]) if filter_params[:project_id] 
-    scope =  scope.has_user_with_id(filter_params[:user_id]) if filter_params[:user_id]
+    scope = scope.has_user_with_id(filter_params[:user_id]) if filter_params[:user_id]
     scope = scope.with_date_between(filter_params[:from_date], filter_params[:to_date]) if filter_params[:from_date] || filter_params[:to_date]
     scope = scope.text_search(filter_params) if filter_params.is_a?(Hash)
     return scope
@@ -129,6 +144,7 @@ class Api::QcLogsApiController < API::ApplicationController
         :substrate_media,
         :substrate_general_comments,
         :user_id,
+        :inspector,
         :project,
         :project_id,
         :approved_applicator,
