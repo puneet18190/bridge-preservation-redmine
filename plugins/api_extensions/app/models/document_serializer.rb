@@ -1,7 +1,7 @@
 class DocumentSerializer < ActiveModel::Serializer
   unloadable
 
-  attributes *Document.attribute_names, :attachments, :category_name
+  attributes *Document.attribute_names, :attachments, :category_name, :user
   include Rails.application.routes.url_helpers
 
  #available event methods
@@ -14,5 +14,17 @@ class DocumentSerializer < ActiveModel::Serializer
    object.attachments
   end
 
+  def user
+    user_h = {}
+    user_id = attachments.first.author_id rescue nil
+    user = User.find(user_id) rescue nil
+    if user
+     user_h['id'] = user.id
+     user_h['email'] = user.mail
+     user_h['firstname'] = user.firstname
+     user_h['lastname'] = user.lastname
+    end
+    return user_h
+  end
 
 end

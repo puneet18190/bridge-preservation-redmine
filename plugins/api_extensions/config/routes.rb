@@ -13,5 +13,9 @@ get '/user_sessions/logged_in', to: 'api/user_sessions_api#logged_in'
 
 
 get 'projects_api/projects/:project_id/documents', to: 'api/documents_api#index' 
+get '/document_categories', to: 'api/documents_api#document_categories' 
+
 get 'projects_api/projects/:project_id/notes', to: 'api/notes_api#index'
 get 'projects_api/projects/:project_id/applicators', to: 'api/applicators_api#index'
+
+post 'projects_api/projects/:project_id/documents', to: 'api/documents_api#create'
