@@ -11,7 +11,16 @@ class DocumentSerializer < ActiveModel::Serializer
  end
 
   def attachments
-   object.attachments
+   attachments = []
+   object.attachments.each do |a|
+    attachment_hash = a.attributes
+    attachment_hash['download_url'] = url_for(:action => 'download', controller: 'attachments', id: a.id, only_path: true)
+    attachment_hash['download_url'] = attachment_hash['download_url'] +"/#{URI.escape(a.filename)}"
+    attachments << attachment_hash
+   end
+  
+   return attachments
+  
   end
 
   def user
