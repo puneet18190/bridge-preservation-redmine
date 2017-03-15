@@ -22,3 +22,6 @@ post 'projects_api/projects/:project_id/documents', to: 'api/documents_api#creat
 put 'projects_api/projects/:project_id/documents/:id', to: 'api/documents_api#update'
 
 get 'projects_api/projects/:project_id/documents/:id', to: 'api/documents_api#show'
+
+
+get 'api_users/:id', to: 'api/users#show'

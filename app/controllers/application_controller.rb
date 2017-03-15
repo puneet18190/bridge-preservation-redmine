@@ -253,6 +253,7 @@ class ApplicationController < ActionController::Base
 
   # Authorize the user for the requested action
   def authorize(ctrl = params[:controller], action = params[:action], global = false)
+
     allowed = User.current.allowed_to?({:controller => ctrl, :action => action}, @project || @projects, :global => global)
     if allowed
       true
@@ -659,7 +660,7 @@ class ApplicationController < ActionController::Base
   end
 
   # Renders API response on validation failure
-  # for an object or an array of objects
+  # for an object or an array of objectsPP
   def render_validation_errors(objects)
     messages = Array.wrap(objects).map {|object| object.errors.full_messages}.flatten
     render_api_errors(messages)
