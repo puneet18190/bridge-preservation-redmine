@@ -29,6 +29,7 @@ class Api::QcLogsApiController < API::ApplicationController
 
   # Lists visible projects
  def index
+    byebug
     scope = QcLog.visible
 
     scope = search_filter(scope)
@@ -66,9 +67,7 @@ class Api::QcLogsApiController < API::ApplicationController
     qc_log = QcLog.new(qc_log_params)
 
     if qc_log.save
-      unless User.current.admin?
-        qc_log.add_default_member(User.current)
-      end
+    
       render json:  { qc_log: qc_log }
     else
       render json:  { qc_log: render_validation_errors(qc_log) }, status: :unprocessable_entity
@@ -97,9 +96,7 @@ class Api::QcLogsApiController < API::ApplicationController
     qc_log = QcLog.find(params[:id])
 
     if qc_log.update_attributes(qc_log_params)
-      unless User.current.admin?
-        qc_log.add_default_member(User.current)
-      end
+   
       render json:  { qc_log: qc_log }
     else
       render json:  { qc_log: render_validation_errors(qc_log) }, status: :unprocessable_entity
