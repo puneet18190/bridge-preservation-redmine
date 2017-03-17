@@ -7,7 +7,7 @@ class Api::QcLogsApiController < API::ApplicationController
   menu_item :settings, :only => :settings
 
 #  before_filter :find_project, :except => [ :index, :list, :new, :create, :copy ]
-  before_filter ->(controller='qc_logs', action=params[:action] ){authorize(controller, action, true)}, :except => [:list, :new, :create, :copy, :archive, :unarchive, :destroy]
+  before_filter ->(controller='qc_logs', action=params[:action] ){authorize(controller, action, true)}, :except => [:list, :index, :new, :create, :copy, :archive, :unarchive, :destroy]
   before_filter :authorize_global, :only => [:new, :create]
   before_filter :require_admin, :only => [ :copy, :archive, :unarchive, :destroy ]
   accept_rss_auth :index
@@ -92,6 +92,7 @@ class Api::QcLogsApiController < API::ApplicationController
     if params["qc_log"].present? && params["qc_log"]["project_id"].present?
       params["qc_log"]["project"] = Project.find(params["qc_log"]["project_id"].to_i)
     end
+
 
     qc_log = QcLog.find(params[:id])
 
