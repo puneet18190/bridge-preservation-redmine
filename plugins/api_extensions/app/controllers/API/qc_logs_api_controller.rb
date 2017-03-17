@@ -29,7 +29,7 @@ class Api::QcLogsApiController < API::ApplicationController
 
   # Lists visible projects
  def index
-    byebug
+    
     scope = QcLog.visible
 
     scope = search_filter(scope)
