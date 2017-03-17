@@ -15,7 +15,7 @@
         <% @qc_logs.each do |log| %>
           <tr>
             <td>
-              <%= log["date"] %>
+              <%= log["date"].strftime('%m/%d/%Y') rescue nil %>
             </td>
             <td>
               <%= log["approved_applicator"] %>
@@ -27,7 +27,7 @@
               <%= log["status"] %>
             </td>
             <td>
-              <%= link_to 'View log', "#{Redmine::Configuration['prototype_domain_path']}/qc_logs/#{log.id}/edit", class: "btn btn-primary" %>
+              <%= link_to 'View log', "#{Redmine::Configuration['prototype_domain_path']}/qc_log/#{log.id}/log_pdf.pdf", class: "btn btn-primary" %>
             </td>
           </tr>
         <% end %>

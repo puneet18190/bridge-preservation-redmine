@@ -32,7 +32,7 @@ class Api::QcLogsApiController < API::ApplicationController
     scope = QcLog.visible
 
     scope = search_filter(scope)
-    
+
     @qc_logs = paginate scope, per_page: params[:per_page], page: params[:page]
     #included_data = params[:include].split(',') rescue []
     #include_activities = included_data.include?('activities')
@@ -93,10 +93,7 @@ class Api::QcLogsApiController < API::ApplicationController
       params["qc_log"]["project"] = Project.find(params["qc_log"]["project_id"].to_i)
     end
 
-    byebug
-
     qc_log = QcLog.find(params[:id])
-
 
     if qc_log.update_attributes(qc_log_params)
       unless User.current.admin?
@@ -124,7 +121,7 @@ class Api::QcLogsApiController < API::ApplicationController
   def search_filter(scope)
     filter_params = params[:filters] || {}
     filter_params = filter_params.reject{|k, v|  v.blank? }
-    scope = scope.has_project_with_id(filter_params[:project_id]) if filter_params[:project_id] 
+    scope = scope.has_project_with_id(filter_params[:project_id]) if filter_params[:project_id]
     scope = scope.has_user_with_id(filter_params[:user_id]) if filter_params[:user_id]
     scope = scope.with_date_between(filter_params[:from_date], filter_params[:to_date]) if filter_params[:from_date] || filter_params[:to_date]
     scope = scope.text_search(filter_params) if filter_params.is_a?(Hash)
@@ -174,6 +171,7 @@ class Api::QcLogsApiController < API::ApplicationController
         :sample_date,
         :sample_sent_by,
         :signature,
+        :status,
         :spray_membrane_application => [:product, :lot_a_number, :lot_a_temperature, :lot_b_number, :lot_b_temperature, :no_gallons_used, :application_equipment, :spray_gun, :spray_module, :set_iso, :set_resin, :set_hose, :temperature_iso, :temperature_resin, :temperature_hose, :pressure_set, :pressure_spray],
         :environmental_conditions => [:time, :temperature, :humidity, :wind_velocity, :substrate_temperature, :substrate_moisture, :dew_point],
         :adhesion_testing_value_and_mode => [:value, :mode_of_failure],
