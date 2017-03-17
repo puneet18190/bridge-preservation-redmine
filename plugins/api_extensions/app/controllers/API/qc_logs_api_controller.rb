@@ -8,7 +8,7 @@ class Api::QcLogsApiController < API::ApplicationController
 
 #  before_filter :find_project, :except => [ :index, :list, :new, :create, :copy ]
   before_filter ->(controller='qc_logs', action=params[:action] ){authorize(controller, action, true)}, :except => [:list, :index, :new, :create, :copy, :archive, :unarchive, :destroy]
-  before_filter :authorize_global, :only => [:new, :create]
+  before_filter ->(controller='qc_logs', action=params[:action]) {authorize_global(controller, action, true) }, :only => [:new, :create]
   before_filter :require_admin, :only => [ :copy, :archive, :unarchive, :destroy ]
   accept_rss_auth :index
   accept_api_auth :index, :show, :create, :update, :destroy
