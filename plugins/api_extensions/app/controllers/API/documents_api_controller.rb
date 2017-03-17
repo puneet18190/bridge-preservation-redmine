@@ -1,6 +1,6 @@
 class Api::DocumentsApiController < API::ApplicationController
   
-  before_action ->(controller='projects', action=params[:action] ){authorize(controller, action, true)}, :except => [:list, :new, :create, :copy, :archive, :unarchive, :destroy]
+  before_action ->(controller='projects', action=params[:action] ){authorize(controller, action, true)}, :except => [:list, :index, :new, :create, :copy, :archive, :unarchive, :destroy]
   before_action :scope_by_user_projects, only: [:index, :create, :show, :update]
   #before_filter :authorize
 
