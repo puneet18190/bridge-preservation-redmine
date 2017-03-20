@@ -6,6 +6,9 @@ class QcLogsController < ApplicationController
   def index
         if params[:project_id]
           project = Project.find_by(identifier: params[:project_id])
+
+          @project_id = project.id rescue nil
+
           project_id = project.id
           return @qc_logs = @qc_logs.where(:project_id => project_id)
         end
