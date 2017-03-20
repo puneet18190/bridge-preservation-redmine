@@ -6,14 +6,17 @@ class UserSerializer < ActiveModel::Serializer
 
 
   def roles
-  	project_roles = {}
+  	project_roles = []
   	project_memberships = object.memberships.includes(:roles)
+  	
   	project_memberships.each do |m|
-
-  		project_roles[:project_id] = m.project_id
-  		project_roles[:role_names] = m.roles.map(&:name)
-  		project_roles[:permissions] = m.roles.map(&:permissions).flatten.uniq
+  		project_role  = {}
+  		project_role[:project_id] = m.project_id
+  		project_role[:role_names] = m.roles.map(&:name)
+  		project_role[:permissions] = m.roles.map(&:permissions).flatten.uniq
+  		project_roles << project_role
   	end
+
   	return project_roles 
   end
 

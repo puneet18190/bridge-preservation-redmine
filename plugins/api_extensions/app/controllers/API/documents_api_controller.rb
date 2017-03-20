@@ -1,7 +1,9 @@
 class Api::DocumentsApiController < API::ApplicationController
   
-  before_action ->(controller='projects', action=params[:action] ){authorize(controller, action, true)}, :except => [:list, :index, :new, :create, :copy, :archive, :unarchive, :destroy]
-  before_action :scope_by_user_projects, only: [:index, :create, :show, :update]
+  before_action ->(controller='projects', action=params[:action] ){authorize(controller, action, true)}, :except => 
+  [:list, :index, :new, :create, :copy, :archive, :unarchive, :destroy,
+    :document_categories]
+  before_action :set_scope, only: [:index, :create, :show, :update]
   #before_filter :authorize
 
   accept_rss_auth :index
@@ -18,7 +20,7 @@ class Api::DocumentsApiController < API::ApplicationController
   rescue_from ActiveRecord::RecordNotFound, :with => :record_not_found
   # Lists visible projects
  def index
-    scope = Document.where(project_id: @project).includes(attachments: :author) rescue []
+    scope = @scope.includes(attachments: :author) rescue []
 
 
     @documents = paginate scope, per_page: params[:per_page], page: params[:page]
@@ -29,9 +31,9 @@ class Api::DocumentsApiController < API::ApplicationController
 end
 
  def show
-    scope = Document.where(project_id: @project) rescue []
+    #scope = Document.where(project_id: @project) rescue []
     
-    scope = scope.find(params[:id])
+    @scope = scope.find(params[:id])
 
 
     render json: scope, serializer: ActiveModel::Serializer::DocumentSerializer
@@ -100,9 +102,35 @@ end
   private 
 
   
-  def scope_by_user_projects
+  def set_scope
     @project = Project.visible.find(params[:project_id])
+    @scope = Document.where(project_id: @project) 
+    current_user_groups = User.current.groups.select{|g| !g.memberships.where(project:@project).empty?}
+    current_project_roles = User.current.roles_for_project(@project).map(&:name)
+    if current_project_roles.include?('Applicator')
+      users  = User.where(id: @scope.collect{|c| c.attachments.map(&:author_id)}.flatten - [User.current.id])
+
+
+      user_id_and_roles = users.collect{|u| {user: u,  role_names: u.roles_for_project(@project).map(&:name) }}.flatten
   
+
+      not_users = user_id_and_roles.flatten.select{|s| s[:role_names].include?('Applicator')}.map{|m| m[:user]}
+      not_user_ids = []
+
+
+      not_users.each do |u|
+        user_groups = u.groups.select{|g| !g.memberships.where(project: @project).empty? }
+
+        unless !(current_user_groups.map(&:id) & user_groups.map(&:id) ).empty?
+          not_user_ids << u.id 
+        end
+      end
+
+
+      
+      @scope = @scope.joins(:attachments).where.not('attachments.author_id IN (?)', not_user_ids) if !not_user_ids.empty?
+    end
+
   end
 
   def record_not_found
