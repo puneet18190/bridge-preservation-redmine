@@ -974,3 +974,33 @@ div.details {padding: 20px !important;}
 	background: url(../images/bp_logo.png) no-repeat 6px 13px;
     background-size: 75px auto;
 }
+
+a.btn {
+	display: inline-block;
+    font-weight: normal;
+    line-height: 1.25;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 0rem;
+    text-decoration: none !important;
+}
+
+a.btn.btn-orange {
+	color: #fff !important;
+    background-color: #f05731;
+    text-decoration: none !important;
+}
+
+a.btn.btn-orange:hover {
+	color: #fff !important;
+    background-color: #de3910;
+}
