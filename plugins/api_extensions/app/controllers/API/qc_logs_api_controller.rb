@@ -29,8 +29,8 @@ class Api::QcLogsApiController < API::ApplicationController
 
   # Lists visible projects
  def index
-    
-    scope = QcLog.visible
+
+    scope = QcLog.applicator_visible
 
     scope = search_filter(scope)
 

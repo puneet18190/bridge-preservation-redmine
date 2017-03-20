@@ -26,7 +26,38 @@ class QcLog < ActiveRecord::Base
     scope "has_".concat(s).concat("_with_id").to_sym, -> (id){includes(s.to_sym).where("#{assoc_table_name}.id = ?", id).references(assoc_table_name) }
   end
 
+  def self.applicator_visible
+    scope = self.visible
+    current_user_groups = User.current.groups.select{|g| !g.memberships.empty?}
+    roles = User.current.projects_by_role.keys.map(&:name)
+    
+    
+    if roles.include?('Applicator')
+      users  = User.where(id: scope.collect{|c| c.user_id}.flatten - [User.current.id])
 
+
+      user_id_and_roles = users.collect{|u| {user: u,  role_names: u.projects_by_role.keys.map(&:name) }}.flatten
+  
+
+      not_users = user_id_and_roles.flatten.select{|s| s[:role_names].include?('Applicator')}.map{|m| m[:user]}
+      not_user_ids = []
+
+
+      not_users.each do |u|
+        user_groups = u.groups.select{|g| !g.memberships.empty? }
+
+        unless !(current_user_groups.map(&:id) & user_groups.map(&:id) ).empty?
+          not_user_ids << u.id 
+        end
+      end
+
+
+      
+      scope = scope.where.not(user_id: not_user_ids) if !not_user_ids.empty?
+      return scope
+    end
+    
+  end
 
   def self.text_search(params)
     scope = self.where(nil)
