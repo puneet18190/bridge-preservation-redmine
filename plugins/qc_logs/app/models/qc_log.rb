@@ -30,7 +30,7 @@ class QcLog < ActiveRecord::Base
     scope = self.visible
     current_user_groups = User.current.groups.select{|g| !g.memberships.empty?}
     roles = User.current.projects_by_role.keys.map(&:name)
-    
+    not_user_ids = []
     
     if roles.include?('Applicator')
       users  = User.where(id: scope.collect{|c| c.user_id}.flatten - [User.current.id])
@@ -40,7 +40,7 @@ class QcLog < ActiveRecord::Base
   
 
       not_users = user_id_and_roles.flatten.select{|s| s[:role_names].include?('Applicator')}.map{|m| m[:user]}
-      not_user_ids = []
+      
 
 
       not_users.each do |u|
@@ -50,12 +50,12 @@ class QcLog < ActiveRecord::Base
           not_user_ids << u.id 
         end
       end
-
+     end
 
       
       scope = scope.where.not(user_id: not_user_ids) if !not_user_ids.empty?
       return scope
-    end
+    
     
   end
 
