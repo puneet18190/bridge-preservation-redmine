@@ -32,8 +32,8 @@ end
 
  def show
     #scope = Document.where(project_id: @project) rescue []
-    
-    @scope = scope.find(params[:id])
+      
+    scope = @scope.find(params[:id])
 
 
     render json: scope, serializer: ActiveModel::Serializer::DocumentSerializer
@@ -127,9 +127,9 @@ end
       end
 
 
-      
+
       @scope = @scope.joins(:attachments).where.not('attachments.author_id IN (?)', not_user_ids) if !not_user_ids.empty?
-    end
+    end 
 
   end
 
