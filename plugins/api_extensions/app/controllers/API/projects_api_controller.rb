@@ -31,8 +31,8 @@ class Api::ProjectsApiController < API::ApplicationController
  def index
 
     scope = Project.visible.sorted
-    scope = all_search_filters(scope).includes(:products)
-
+    scope = all_search_filters(scope).includes(:products, :custom_values)
+    
     #@offset, @limit = api_offset_and_limit
     #@project_count = scope.count
    # @projects = scope.offset(@offset).limit(@limit).to_a

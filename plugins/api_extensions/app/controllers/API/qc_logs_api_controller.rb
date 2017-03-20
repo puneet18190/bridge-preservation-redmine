@@ -30,7 +30,7 @@ class Api::QcLogsApiController < API::ApplicationController
   # Lists visible projects
  def index
 
-    scope = QcLog.applicator_visible
+    scope = QcLog.visible_extended
 
     scope = search_filter(scope)
 

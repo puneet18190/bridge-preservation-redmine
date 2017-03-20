@@ -26,8 +26,14 @@ class QcLog < ActiveRecord::Base
     scope "has_".concat(s).concat("_with_id").to_sym, -> (id){includes(s.to_sym).where("#{assoc_table_name}.id = ?", id).references(assoc_table_name) }
   end
 
-  def self.applicator_visible
+  def self.visible_extended
     scope = self.visible
+
+    unless User.current.admin
+      draft_scope = scope.where(status: 'Draft').where.not(user_id: User.current.id).ids
+      scope = scope.where.not(id: draft_scope)
+    end
+
     current_user_groups = User.current.groups.select{|g| !g.memberships.empty?}
     roles = User.current.projects_by_role.keys.map(&:name)
     not_user_ids = []
@@ -52,7 +58,7 @@ class QcLog < ActiveRecord::Base
       end
      end
 
-      
+
       scope = scope.where.not(user_id: not_user_ids) if !not_user_ids.empty?
       return scope
     
