@@ -52,6 +52,7 @@ class MembersController < ApplicationController
 
   def create
     members = []
+    
     if params[:membership]
       user_ids = Array.wrap(params[:membership][:user_id] || params[:membership][:user_ids])
       user_ids << nil if user_ids.empty?
@@ -99,7 +100,9 @@ class MembersController < ApplicationController
   end
 
   def destroy
+  
     if @member.deletable?
+
       @member.destroy
     end
     respond_to do |format|

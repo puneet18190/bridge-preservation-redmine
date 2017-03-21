@@ -33,6 +33,7 @@ group :ldap do
 end
 
 gem 'active_model_serializers'
+gem 'api_pagination'
 
 # Optional gem for OpenID authentication
 group :openid do

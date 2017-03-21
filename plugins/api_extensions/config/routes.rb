@@ -18,6 +18,9 @@ get '/document_categories', to: 'api/documents_api#document_categories'
 get 'projects_api/projects/:project_id/notes', to: 'api/notes_api#index'
 get 'projects_api/projects/:project_id/applicators', to: 'api/applicators_api#index'
 
+delete 'applicators/:id', to: 'api/applicators_api#destroy'
+
+
 post 'projects_api/projects/:project_id/documents', to: 'api/documents_api#create'
 put 'projects_api/projects/:project_id/documents/:id', to: 'api/documents_api#update'
 
