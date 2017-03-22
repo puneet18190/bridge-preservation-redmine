@@ -64,8 +64,8 @@ class Api::ProjectsApiController < Api::ApplicationController
   end
 
   def search_filter(scope)
-    filter_params = params[:filters]
-    scope = scope.has_project_with_id(params[:project_id]) if params[:project_id]
+    filter_params = params[:filters] || {}
+    scope = scope.where(id: filter_params[:project_id]) if filter_params[:project_id]
     scope = scope.text_search(filter_params) if filter_params.is_a?(Hash)
     return scope
 
