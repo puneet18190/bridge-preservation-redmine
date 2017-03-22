@@ -31,7 +31,7 @@
               <%= log["status"] %>
             </td>
             <td>
-              <%= link_to 'Edit Log', "#{Redmine::Configuration['prototype_domain_path']}/qc_log/#{log.id}/edit", target: "_blank", class: "btn btn-primary" %>
+              <%= link_to 'Edit Log', "#{Redmine::Configuration['prototype_domain_path']}/qc_logs/#{log.id}/edit", target: "_blank", class: "btn btn-primary" %>
             </td>
             <td>
               <%= link_to 'View PDF', "#{Redmine::Configuration['prototype_domain_path']}/qc_log/#{log.id}/log_pdf.pdf", target: "_blank", class: "btn btn-primary" %>
