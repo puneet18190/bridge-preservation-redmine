@@ -1,4 +1,4 @@
-class Api::ProjectsApiController < API::ApplicationController
+class Api::ProjectsApiController < Api::ApplicationController
   
 
   unloadable

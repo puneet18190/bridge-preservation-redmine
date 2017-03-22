@@ -1,4 +1,4 @@
-class Api::DocumentsApiController < API::ApplicationController
+class Api::DocumentsApiController < Api::ApplicationController
   
   before_action ->(controller='projects', action=params[:action] ){authorize(controller, action, true)}, :except => 
   [:list, :index, :new, :create, :copy, :archive, :unarchive, :destroy,

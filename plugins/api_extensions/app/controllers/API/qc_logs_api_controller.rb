@@ -1,4 +1,4 @@
-class Api::QcLogsApiController < API::ApplicationController
+class Api::QcLogsApiController < Api::ApplicationController
 
 
   unloadable
