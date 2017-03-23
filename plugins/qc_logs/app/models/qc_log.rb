@@ -66,8 +66,8 @@ class QcLog < ActiveRecord::Base
         draft_scope = draft_scope.where(user_id: User.current.id)
       end
 
-      return QcLog.from("(#{scope.to_sql} UNION ALL #{draft_scope.to_sql}) as qc_logs")
-    
+      new_scope_ids = QcLog.from("(#{scope.to_sql} UNION ALL #{draft_scope.to_sql}) as qc_logs").ids
+      return QcLog.where(id: new_scope_ids)
     
   end
 
