@@ -4,6 +4,10 @@ class QcLog < ActiveRecord::Base
   belongs_to :user
   scope :visible, lambda {|*args| joins(:project).where(Project.allowed_to_condition(args.first || User.current, :view_qc_logs)) }
 
+  acts_as_event :title  => Proc.new {|o| "#{l(:label_document)}: #{o.title}"},
+                :author => Proc.new {|o| User.try(:find, o.id) },
+                :url => Proc.new {|o| {:controller => 'qc_logs', :action => 'show', :id => o.id}}
+  acts_as_activity_provider :scope => preload(:project)
   #define partial match text searches for text columns
   columns.map(&:name).uniq.each do |s|
 
@@ -27,12 +31,9 @@ class QcLog < ActiveRecord::Base
   end
 
   def self.visible_extended
-    scope = self.visible
+    scope = self.visible.where.not(status: 'Draft')
+    draft_scope = scope.unscope(:where, :joins).where(status: 'Draft')
 
-    unless User.current.admin
-      draft_scope = scope.where(status: 'Draft').where.not(user_id: User.current.id).ids
-      scope = scope.where.not(id: draft_scope)
-    end
 
     current_user_groups = User.current.groups.select{|g| !g.memberships.empty?}
     roles = User.current.projects_by_role.keys.map(&:name)
@@ -60,7 +61,12 @@ class QcLog < ActiveRecord::Base
 
 
       scope = scope.where.not(user_id: not_user_ids) if !not_user_ids.empty?
-      return scope
+      
+      unless User.current.admin
+        draft_scope = draft_scope.where(user_id: User.current.id)
+      end
+
+      return QcLog.from("(#{scope.to_sql} UNION ALL #{draft_scope.to_sql}) as qc_logs")
     
     
   end
