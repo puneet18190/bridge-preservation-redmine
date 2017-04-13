@@ -70,7 +70,37 @@ class QcLog < ActiveRecord::Base
       return QcLog.where(id: new_scope_ids)
     
   end
+    #maybe make these methods DRY and condense to one method
+  def self.batch_number_search(value)
+    scope_ids = self.find_by_sql("
+      select * from qc_logs t, jsonb_array_elements(t.spray_membrane_application) as elem where elem->>'lot_a_number' LIKE '%#{value}%'
+      OR elem->>'lot_b_number' LIKE '%#{value}%'
+      OR t.primer_lot_b_number LIKE '%#{value}%' 
+      OR t.primer_lot_a_number LIKE '%#{value}%' ")
+    
+    return QcLog.where(id: scope_ids)
+    #return QcLog.where(id: scope.map(&:id)) #translate scope back to active record relation
+  end
 
+  def self.product_search(value)
+    scope_ids = self.find_by_sql("
+      select * from qc_logs t, jsonb_array_elements(t.spray_membrane_application) as elem where elem->>'product' LIKE '%#{value}%'
+      OR elem->>'product' LIKE '%#{value}%'
+      OR t.primer_product LIKE '%#{value}%'")
+    
+    return QcLog.where(id: scope_ids)
+    #return QcLog.where(id: scope.map(&:id)) #translate scope back to active record relation
+  end
+
+  def self.owner_search(value)
+      project_scope_ids = self.pluck(:project_id)
+      filter_value = Contact.where('first_name ILIKE ?', "%#{value}%").ids.map(&:to_s)
+      custom_field_id = ProjectCustomField.where(name:'Owner').first.try(:id)
+      new_project_ids = CustomValue.where(customized_type: 'Project', customized_id: project_scope_ids, custom_field_id: custom_field_id).
+                      where('value IN (?)', filter_value).pluck(:customized_id)
+      return self.where(project_id: new_project_ids)
+  end
+  
   def self.text_search(params)
     scope = self.where(nil)
     params.each do |key, value|

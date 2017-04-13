@@ -32,13 +32,18 @@ class Api::QcLogsApiController < Api::ApplicationController
 
     scope = QcLog.visible_extended
 
-    scope = search_filter(scope)
+    scope = search_filter(scope).includes(:project)
+    field_id = ProjectCustomField.where(name: 'Owner').first.try(:id)
+    custom_values = CustomValue.where(customized_id: scope.map(&:project_id), custom_field_id: field_id)
+    contacts = Contact.where(id: custom_values.map(&:value).map(&:to_i))
 
     @qc_logs = paginate scope, per_page: params[:per_page], page: params[:page]
     #included_data = params[:include].split(',') rescue []
     #include_activities = included_data.include?('activities')
+    
 
-    render json:  @qc_logs
+    render json:  ActiveModel::Serializer::CollectionSerializer.new(@qc_logs, serializer: ActiveModel::Serializer::QcLogSerializer, 
+      custom_values: custom_values, contacts: contacts )
 
   end
 
@@ -122,6 +127,9 @@ class Api::QcLogsApiController < Api::ApplicationController
     scope = scope.has_project_with_id(filter_params[:project_id]) if filter_params[:project_id]
     scope = scope.has_user_with_id(filter_params[:user_id]) if filter_params[:user_id]
     scope = scope.with_date_between(filter_params[:from_date], filter_params[:to_date]) if filter_params[:from_date] || filter_params[:to_date]
+    scope = scope.batch_number_search(filter_params[:batch_number]) if filter_params[:batch_number]
+    scope = scope.product_search(filter_params[:product]) if filter_params[:product]
+    scope = scope.owner_search(filter_params[:owner]) if filter_params[:owner]
     scope = scope.text_search(filter_params) if filter_params.is_a?(Hash)
     return scope
 
