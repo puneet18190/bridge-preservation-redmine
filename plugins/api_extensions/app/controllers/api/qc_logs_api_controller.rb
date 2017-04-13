@@ -169,6 +169,7 @@ class Api::QcLogsApiController < Api::ApplicationController
         :primer_comments,
         :application_thickness_instrument,
         :application_thickness_method,
+        :application_comments,
         :adhesion_testing_instrument,
         :adhesion_testing_method,
         :general_application_comments,
@@ -178,7 +179,7 @@ class Api::QcLogsApiController < Api::ApplicationController
         :sample_sent_by,
         :signature,
         :status,
-        :spray_membrane_application => [:product, :lot_a_number, :lot_a_temperature, :lot_b_number, :lot_b_temperature, :no_gallons_used, :application_equipment, :spray_gun, :spray_module, :set_iso, :set_resin, :set_hose, :temperature_iso, :temperature_resin, :temperature_hose, :pressure_set, :pressure_spray],
+        :spray_membrane_application => [:product, :lot_a_number, :lot_a_temperature, :lot_b_number, :lot_b_temperature, :no_gallons_used, :application_equipment, :spray_gun, :spray_module, :set_iso, :set_resin, :set_hose, :temperature_iso, :temperature_resin, :temperature_hose, :pressure_set, :pressure_spray, :pressure_set_resin, :pressure_spray_resin],
         :environmental_conditions => [:time, :temperature, :humidity, :wind_velocity, :substrate_temperature, :substrate_moisture, :dew_point],
         :adhesion_testing_value_and_mode => [:value, :mode_of_failure],
         :application_value_and_location  => [:value, :location]
