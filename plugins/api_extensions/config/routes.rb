@@ -29,3 +29,5 @@ get 'projects_api/projects/:project_id/documents/:id', to: 'api/documents_api#sh
 
 get 'api_users/:id', to: 'api/users#show'
 get 'api_users', to: 'api/users#index'
+
+get 'projects_api/list_custom_field_options', to: 'api/projects_api#list_custom_field_options'
